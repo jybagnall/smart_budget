@@ -14,28 +14,43 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
+const authRoutes = require("./routes/authRoutes");
+
 const allowedOrigins = [
   process.env.FRONTEND_URL, // local front
-  process.env.PRODUCTION_FRONTEND_URL || "",
+  process.env.PRODUCTION_FRONTEND_URL,
 ].filter(Boolean); // remove empty values
 
-// * allows all origins to avoid CORS errors
+// If `allowedOrigins` is empty, allow all origins (only in development)
 app.use(
   cors({
-    origin: allowedOrigins.length > 0 ? allowedOrigins : "*",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS policy violation"));
+    },
     credentials: true,
   })
 );
 
-app.use((err, req, res, next) => {
-  console.error("Global error handler:", err);
-  return res.status(500).json({ message: "Server error" });
+app.use((req, res, next) => {
+  if (req.user) {
+    req.session.user = req.user;
+  }
+  next();
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.get("/", (req, res) => {
-  res.send("Backend is running! 🚀");
+app.use("/api/auth", authRoutes);
+
+app.use((err, req, res, next) => {
+  console.error("Global error handler:", err);
+  const statusCode = err.status || 500;
+  return res
+    .status(statusCode)
+    .json({ message: err.message || "Server error" });
 });
 
 app.listen(PORT, () => {

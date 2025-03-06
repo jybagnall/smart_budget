@@ -5,13 +5,16 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./components/App";
 import { UserProvider } from "./contexts/UserContext";
+import { TargetMonthProvider } from "./contexts/TargetMonthContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <UserProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <TargetMonthProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </TargetMonthProvider>
     </UserProvider>
   </StrictMode>
 );

@@ -15,21 +15,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const authRoutes = require("./routes/authRoutes");
+const formRoutes = require("./routes/formRoutes");
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL, // local front
-  process.env.PRODUCTION_FRONTEND_URL,
-].filter(Boolean); // remove empty values
-
-// If `allowedOrigins` is empty, allow all origins (only in development)
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error("CORS policy violation"));
-    },
+    origin: ["http://localhost:5173"],
     credentials: true,
   })
 );
@@ -44,6 +34,7 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.use("/api/auth", authRoutes);
+app.use("/api/form", formRoutes);
 
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err);

@@ -38,6 +38,7 @@ router.get("/user", (req, res) => {
     return res.status(401).json({ user: null });
   }
 
-  res.json({ user: req.user });
+  return res.json({ user: req.user });
 });
+
 module.exports = router;

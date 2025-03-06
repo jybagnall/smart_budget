@@ -9,7 +9,8 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const abortController = new AbortController();
-    fetchUser(abortController);
+
+    fetchUser(abortController).catch(console.error); // Catch async errors
 
     return () => {
       abortController.abort();
@@ -26,10 +27,10 @@ export const UserProvider = ({ children }) => {
 
       setUser(res.data.user);
     } catch (e) {
-      if (!abortController.signal.aborted) {
-        console.error("User not logged in", e);
-        setUser(null);
+      console.error("Error fetching user:", e);
 
+      if (!abortController.signal.aborted) {
+        setUser(null);
         if (e.response?.status === 401) {
           window.location.href = "/login";
         }
@@ -45,3 +46,5 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
+
+export default UserContext;

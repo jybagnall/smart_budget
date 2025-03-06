@@ -4,11 +4,10 @@ const mysql = require("mysql2/promise");
 const isProduction = process.env.NODE_ENV === "production";
 
 const pool = mysql.createPool({
-  host: isProduction
-    ? process.env.DB_HOST
-    : process.env.DOCKERIZED === "true"
-    ? "mysql" // Docker service name
-    : process.env.DB_HOST,
+  host:
+    process.env.DOCKERIZED === "true"
+      ? "mysql" // Docker service name
+      : process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
@@ -17,9 +16,8 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   connectTimeout: 20000,
-  acquireTimeout: 20000,
-  ssl:
-    process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : undefined,
+  //acquireTimeout: 20000,
+  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
 });
 
 (async () => {

@@ -6,6 +6,7 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hasBudget, setHasBudget] = useState(false);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -17,6 +18,12 @@ export const UserProvider = ({ children }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      setHasBudget(false);
+    }
+  }, [user]);
+
   async function fetchUser(abortController) {
     setLoading(true);
     try {
@@ -26,6 +33,13 @@ export const UserProvider = ({ children }) => {
       });
 
       setUser(res.data.user);
+
+      if (res.data.user) {
+        const budgetRes = await axios.get("/api/auth/check-budget", {
+          withCredentials: true,
+        });
+        setHasBudget(budgetRes.data.hasBudget);
+      }
     } catch (e) {
       console.error("Error fetching user:", e);
 
@@ -41,7 +55,9 @@ export const UserProvider = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser, loading, setLoading }}>
+    <UserContext.Provider
+      value={{ user, setUser, loading, setLoading, hasBudget }}
+    >
       {children}
     </UserContext.Provider>
   );

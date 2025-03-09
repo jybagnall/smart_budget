@@ -4,7 +4,7 @@ const router = express.Router();
 const pool = require("../config/db");
 const { isLoggedIn } = require("../middleware");
 
-router.post("/budgets", isLoggedIn, async (req, res) => {
+router.post("/set-budgets", isLoggedIn, async (req, res) => {
   const { year, month, target_amount } = req.body;
   const userId = req.user.id;
 
@@ -22,7 +22,8 @@ router.post("/budgets", isLoggedIn, async (req, res) => {
     if (!dateId) throw new Error("Failed to retrieve date ID");
 
     const insertBudgets_q =
-      "INSERT INTO budgets (user_id, date_id, target_amount) VALUE (?, ?, ?)";
+      "INSERT INTO budgets (user_id, date_id, target_amount) VALUE (?, ?, ?) ON DUPLICATE KEY UPDATE target_amount=VALUES(target_amount)";
+
     await pool.execute(insertBudgets_q, [userId, dateId, target_amount]);
 
     return res
@@ -33,5 +34,3 @@ router.post("/budgets", isLoggedIn, async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
-//router.post("/income", async (req, res) => {});

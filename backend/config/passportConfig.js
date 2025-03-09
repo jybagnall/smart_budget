@@ -4,17 +4,12 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const pool = require("./db");
 
-const BACKEND_URL =
-  process.env.NODE_ENV === "production"
-    ? process.env.PRODUCTION_BACKEND_URL
-    : process.env.BACKEND_URL;
-
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${BACKEND_URL}/api/auth/google/callback`,
+      callbackURL: process.env.GOOGLE_REDIRECT_URI,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

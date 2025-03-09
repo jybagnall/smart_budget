@@ -15,7 +15,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const authRoutes = require("./routes/authRoutes");
-const formRoutes = require("./routes/formRoutes");
+const budgetRoutes = require("./routes/budgetRoute");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 app.use(
   cors({
@@ -34,7 +35,8 @@ app.use((req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.use("/api/auth", authRoutes);
-app.use("/api/form", formRoutes);
+app.use("/api/budgets", budgetRoutes);
+app.use("/api/categories", categoryRoutes);
 
 app.use((err, req, res, next) => {
   console.error("Global error handler:", err);

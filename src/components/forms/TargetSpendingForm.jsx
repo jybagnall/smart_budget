@@ -31,11 +31,11 @@ export default function TargetSpendingForm() {
     };
 
     try {
-      const res = await axios.post("/api/form/budgets", payload, {
+      const res = await axios.post("/api/budgets/set-budgets", payload, {
         withCredentials: true,
       });
 
-      if (res.status === 201) {
+      if (res.status === 201 && res.data.message.includes("successfully")) {
         navigate("/expense-category");
       }
     } catch (e) {
@@ -81,13 +81,12 @@ export default function TargetSpendingForm() {
             <span id="price-currency" className="text-gray-500">
               USD
             </span>
-
-            {errors.targetSpending?.message && (
-              <span className="mt-2 text-xs text-red-600">
-                {errors.targetSpending.message}
-              </span>
-            )}
           </div>
+          {errors.targetSpending?.message && (
+            <span className="mt-2 text-xs text-red-600">
+              {errors.targetSpending.message}
+            </span>
+          )}
         </div>
 
         <button

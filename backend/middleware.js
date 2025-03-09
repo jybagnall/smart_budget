@@ -1,6 +1,8 @@
-module.exports.isLoggedIn = (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized: Please log in." });
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
   }
-  next();
-};
+  res.status(401).json({ error: "Unauthorized" });
+}
+
+module.exports = { isLoggedIn };

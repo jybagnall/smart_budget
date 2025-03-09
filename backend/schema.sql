@@ -55,4 +55,3 @@ CREATE TABLE expenses (
     FOREIGN KEY (date_id) REFERENCES dates(id) ON DELETE CASCADE
 );
 
-INSERT INTO categories (category_name) VALUES ('Food');

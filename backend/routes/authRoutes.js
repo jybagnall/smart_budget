@@ -1,13 +1,8 @@
-require("dotenv").config();
 const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 
-const FRONTEND_URL =
-  process.env.NODE_ENV === "production"
-    ? process.env.PRODUCTION_FRONTEND_URL
-    : process.env.FRONTEND_URL;
-
+const pool = require("../config/db");
 const { isLoggedIn } = require("../middleware");
 
 router.get(
@@ -18,8 +13,8 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: `${FRONTEND_URL}/`,
-    failureRedirect: `${FRONTEND_URL}/login`,
+    successRedirect: process.env.FRONTEND_URL + "/",
+    failureRedirect: process.env.FRONTEND_URL + "/login",
   })
 );
 
@@ -39,6 +34,27 @@ router.get("/user", (req, res) => {
   }
 
   return res.json({ user: req.user });
+});
+
+router.get("/check-budget", isLoggedIn, async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const budget_exists_q =
+      "SELECT target_amount FROM budgets JOIN dates ON budgets.date_id = date.id WHERE budgets.user_id=? AND dates.year= YEAR(CURDATE()) AND dates.month = MONTH(CURDATE())";
+
+    const [budget] = await pool.execute(budget_exists_q, [userId]);
+
+    if (budget.length > 0) {
+      return res.json({ hasBudget: true });
+    } else {
+      return res.json({ hasBudget: false });
+    }
+  } catch (e) {
+    console.error("Error checking budget:", e);
+
+    return res.status(500).json({ message: "Server Error" });
+  }
 });
 
 module.exports = router;

@@ -45,9 +45,6 @@ export const UserProvider = ({ children }) => {
 
       if (!abortController.signal.aborted) {
         setUser(null);
-        if (e.response?.status === 401) {
-          window.location.href = "/login";
-        }
       }
     } finally {
       setLoading(false);

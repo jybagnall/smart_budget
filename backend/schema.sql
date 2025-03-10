@@ -23,17 +23,6 @@ CREATE TABLE budgets (
     FOREIGN KEY (date_id) REFERENCES dates(id) ON DELETE CASCADE
 );
 
-CREATE TABLE income (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    date_id INT NOT NULL, 
-    source VARCHAR(255) NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (date_id) REFERENCES dates(id) ON DELETE CASCADE
-);
-
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT DEFAULT NULL, 
@@ -42,6 +31,7 @@ CREATE TABLE categories (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- did not created this table yet
 CREATE TABLE expenses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,

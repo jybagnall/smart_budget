@@ -1,6 +1,10 @@
 import { NavLink } from "react-router-dom";
+import { useContext } from "react";
+
+import UserContext from "../contexts/UserContext";
 
 export default function Homepage() {
+  const { user } = useContext(UserContext);
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
@@ -13,12 +17,14 @@ export default function Homepage() {
             and stay on top of your finances.
           </p>
           <div className="mt-15 flex items-center justify-center gap-x-6">
-            <NavLink
-              to="/login"
-              className="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-            >
-              Get started
-            </NavLink>
+            {!user && (
+              <NavLink
+                to="/login"
+                className="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+              >
+                Get started
+              </NavLink>
+            )}
           </div>
         </div>
       </div>

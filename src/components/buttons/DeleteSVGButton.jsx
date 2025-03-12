@@ -14,7 +14,7 @@ export default function DeleteSVGButton({ onClick }) {
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth="2"
+          strokeWidth="1"
           d="M6 18L18 6M6 6l12 12"
         />
       </svg>

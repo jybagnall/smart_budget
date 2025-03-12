@@ -6,6 +6,7 @@ import Homepage from "./Homepage";
 import PageNotFound from "./alerts/PageNotFound";
 import CategoryList from "./expenses/CategoryList";
 import ExpenseStatus from "./expenses/ExpenseStatus";
+import PlanExpenses from "./expenses/PlanExpenses";
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
       <Route path="/set-budgets" element={<TargetSpendingForm />} />
       <Route path="/expense-status" element={<ExpenseStatus />} />
       <Route path="/category-list" element={<CategoryList />} />
-
+      <Route path="/plan-expenses" element={<PlanExpenses />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

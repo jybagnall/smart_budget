@@ -36,7 +36,7 @@ export default function TargetSpendingForm() {
       });
 
       if (res.status === 201 && res.data.message.includes("successfully")) {
-        navigate("/expense-category");
+        navigate("/category-list");
       }
     } catch (e) {
       console.error(e);

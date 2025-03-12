@@ -1,8 +1,9 @@
-export default function AddItemButton() {
+export default function AddItemButton({ onClick }) {
   return (
     <button
       type="button"
-      class="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-xs text-teal-700 shadow-xs hover:text-teal-600 "
+      onClick={onClick}
+      className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-xs text-teal-700 shadow-xs hover:text-teal-600 "
     >
       <svg
         className="size-3"

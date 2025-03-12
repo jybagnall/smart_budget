@@ -11,12 +11,8 @@ async function checkUserBudget(userId) {
         AND dates.month = MONTH(CURDATE())
         `;
 
-    const [currentBudget] = pool.execute(currentMonthBudget_q, [userId]);
-    const currentMonthExists = currentBudget.length > 0;
-
-    if (currentMonthExists) {
-      return { currentMonthExists, futureBudget: null };
-    }
+    const [currentBudget] = await pool.execute(currentMonthBudget_q, [userId]);
+    const thisMonthBudget = currentBudget.length > 0 ? currentBudget[0] : null;
 
     const futureBudget_q = `
     SELECT budgets.target_amount, dates.year, dates.month
@@ -24,7 +20,7 @@ async function checkUserBudget(userId) {
     JOIN dates ON budgets.date_id = dates.id
     WHERE budgets.user_id=?
     AND (dates.year > YEAR(CURDATE())
-    OR (dates.year = YEAR(CURDATE()) AND dates.month ? MONTH(CURDATE())))
+    OR (dates.year = YEAR(CURDATE()) AND dates.month > MONTH(CURDATE())))
     ORDER BY dates.year ASC, dates.month ASC
     LIMIT 1
     `;
@@ -34,7 +30,7 @@ async function checkUserBudget(userId) {
     const futureBudget =
       NearestFutureBudget.length > 0 ? NearestFutureBudget[0] : null;
 
-    return { currentMonthExists, futureBudget };
+    return { thisMonthBudget, futureBudget };
   } catch (e) {
     console.error("Error checking user budget:", e);
     throw e;

@@ -3,6 +3,7 @@ import axios from "axios";
 
 import AddCategoryForm from "../forms/AddCategoryForm";
 import CategoryItem from "./CategoryItem";
+import NavigationButton from "../buttons/NavigationButton";
 
 export default function CategoryList() {
   const [categories, setCategories] = useState([]);
@@ -22,11 +23,11 @@ export default function CategoryList() {
     fetchCategories();
   }, []);
 
-  const handleAdd = async (text) => {
+  const handleAdd = async (category_name) => {
     try {
       await axios.post(
         "/api/categories",
-        { text: text.trim() },
+        { category_name: category_name.trim() },
         { withCredentials: true }
       );
 
@@ -64,6 +65,7 @@ export default function CategoryList() {
 
         {/* boder */}
         <div className="flex items-center justify-between space-x-3 mt-4 border-t border-gray-200 px-2 py-2 sm:px-3"></div>
+
         {categories.map((category) => (
           <CategoryItem
             key={category.id}
@@ -71,6 +73,11 @@ export default function CategoryList() {
             handleDelete={handleDelete}
           />
         ))}
+        <div className="mt-3">
+          <NavigationButton to={"/plan-expenses"}>
+            Navigate to add items
+          </NavigationButton>
+        </div>
       </div>
     </div>
   );

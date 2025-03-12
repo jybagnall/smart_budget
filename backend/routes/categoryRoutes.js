@@ -41,9 +41,9 @@ router.post("", isLoggedIn, async (req, res) => {
       "INSERT INTO categories (category_name, user_id) VALUES (?, ?)";
     const [result] = await pool.execute(insert_q, [category_name, user_id]);
 
-    res.status(201).json({ id: result.insertId, category_name });
+    res.status(201).json({ id: result.insertId, category_name, user_id });
   } catch (e) {
-    console.error("Error updating priority:", e);
+    console.error("Error updating category:", e);
     return res.status(500).json({ error: e.message });
   }
 });

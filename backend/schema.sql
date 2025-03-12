@@ -31,6 +31,17 @@ CREATE TABLE categories (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    user_id INT NOT NULL,
+    item_name VARCHAR(100) NOT NULL,
+    planned_amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- did not created this table yet
 CREATE TABLE expenses (
     id INT AUTO_INCREMENT PRIMARY KEY,

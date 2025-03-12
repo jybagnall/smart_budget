@@ -2,9 +2,11 @@ import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 
 import UserContext from "../contexts/UserContext";
+import LogoutButton from "./buttons/LogoutButton";
 
 export default function Homepage() {
   const { user } = useContext(UserContext);
+
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
@@ -26,6 +28,7 @@ export default function Homepage() {
               </NavLink>
             )}
           </div>
+          <LogoutButton />
         </div>
       </div>
     </div>

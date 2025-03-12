@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 
 import SaveSVGButton from "../buttons/SaveSVGButton";
+
 export default function AddCategoryForm({ handleAdd }) {
   const {
     register,
@@ -35,7 +36,7 @@ export default function AddCategoryForm({ handleAdd }) {
             className="block rounded-md w-full focus:outline-none bg-gray-50 py-2 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm"
             placeholder="Category name (ex. Food)"
           />
-          {errors.category?.message && (
+          {errors.category_name && (
             <span className="mt-2 text-xs text-red-600">
               {errors.category_name.message}
             </span>

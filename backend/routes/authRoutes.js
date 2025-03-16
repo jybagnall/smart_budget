@@ -28,9 +28,9 @@ router.get(
       let redirectUrl;
 
       if (thisMonthBudget) {
-        redirectUrl = process.env.FRONTEND_URL + "/expense-status";
+        redirectUrl = process.env.FRONTEND_URL + "/plan-expenses";
       } else if (futureBudget) {
-        redirectUrl = process.env.FRONTEND_URL + "/expense-status";
+        redirectUrl = process.env.FRONTEND_URL + "/plan-expenses";
         // redirectUrl = `${process.env.FRONTEND_URL}/expense-status?year=${futureBudget.year}&month=${futureBudget.month}`;
       } else {
         redirectUrl = process.env.FRONTEND_URL + "/set-budgets";

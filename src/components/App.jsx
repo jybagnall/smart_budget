@@ -17,6 +17,7 @@ function App() {
       <Route path="/expense-status" element={<ExpenseStatus />} />
       <Route path="/category-list" element={<CategoryList />} />
       <Route path="/plan-expenses" element={<PlanExpenses />} />
+
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -19,16 +19,17 @@ export default function Homepage() {
             and stay on top of your finances.
           </p>
           <div className="mt-15 flex items-center justify-center gap-x-6">
-            {!user && (
+            {!user ? (
               <NavLink
                 to="/login"
                 className="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
               >
                 Get started
               </NavLink>
+            ) : (
+              <LogoutButton />
             )}
           </div>
-          <LogoutButton />
         </div>
       </div>
     </div>

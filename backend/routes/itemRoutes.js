@@ -6,18 +6,14 @@ const { isLoggedIn } = require("../middleware");
 
 router.get("", isLoggedIn, async (req, res) => {
   const user_id = req.user.id;
-  const { category_id } = req.query;
 
-  if (!category_id) {
-    return res.status(400).json({ error: "Category ID is required" });
-  }
   try {
     const q = `
-    SELECT id, item_name, planned_amount 
+    SELECT * 
     FROM items 
-    WHERE user_id=? AND category_id=?`;
+    WHERE user_id=?`;
 
-    const [results] = await pool.execute(q, [user_id, category_id]);
+    const [results] = await pool.execute(q, [user_id]);
 
     res.json(results);
   } catch (e) {
@@ -26,19 +22,25 @@ router.get("", isLoggedIn, async (req, res) => {
   }
 });
 
-router.post("", isLoggedIn, async (req, res) => {
+// '/:item_name' or '/item_name'
+router.post("/:categoryId", isLoggedIn, async (req, res) => {
   const user_id = req.user.id;
-  const { category_id, item_name, planned_amount } = req.body;
+  const { categoryId } = req.params;
+  const { item_name, planned_amount } = req.body;
 
-  if (!category_id || !item_name || !planned_amount) {
-    return res.status(400).json({ error: "All fields are required" });
+  if (!categoryId || categoryId === "null" || !item_name || !planned_amount) {
+    return res
+      .status(400)
+      .json({ error: "Invalid category ID or item field is missing" });
   }
 
   try {
-    const insert_q = `INSERT INTO items (category_id, user_id, item_name, planned_amount) VALUES (?, ?, ?, ?)`;
+    const insert_q = `
+    INSERT INTO items (category_id, user_id, item_name, planned_amount) 
+    VALUES (?, ?, ?, ?)`;
 
     const [result] = await pool.execute(insert_q, [
-      category_id,
+      categoryId,
       user_id,
       item_name,
       planned_amount,
@@ -46,11 +48,35 @@ router.post("", isLoggedIn, async (req, res) => {
 
     res.status(201).json({
       id: result.insertId,
-      category_id,
+      categoryId,
       user_id,
       item_name,
       planned_amount,
     });
+  } catch (e) {
+    console.error("Error adding item:", e);
+    return res.status(500).json({ error: "Server Error" });
+  }
+});
+
+// route address ':amount'? patch or post?
+router.patch("/:categoryId/:itemId/amount", isLoggedIn, async (req, res) => {
+  const { categoryId, itemId } = req.params;
+  const { planned_amount } = req.body;
+
+  if (!categoryId || !itemId || !planned_amount) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const update_q = `
+    UPDATE items 
+    SET planned_amount=? 
+    WHERE category_id=? AND id=?`;
+
+    await pool.execute(update_q, [planned_amount, categoryId, itemId]);
+
+    res.status(200).json({ planned_amount });
   } catch (e) {
     console.error("Error adding item:", e);
     return res.status(500).json({ error: "Server Error" });

@@ -32,7 +32,7 @@ export default function AddCategoryForm({ handleAdd }) {
             })}
             type="text"
             name="category_name"
-            id="_name"
+            id="category_name"
             className="block rounded-md w-full focus:outline-none bg-gray-50 py-2 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm"
             placeholder="Category name (ex. Food)"
           />

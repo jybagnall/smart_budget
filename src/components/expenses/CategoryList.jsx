@@ -18,7 +18,7 @@ export default function CategoryList() {
       console.error("Error fetching categories:", error);
     }
   };
-
+ 
   useEffect(() => {
     fetchCategories();
   }, []);

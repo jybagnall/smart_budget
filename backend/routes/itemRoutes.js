@@ -59,24 +59,34 @@ router.post("/:categoryId", isLoggedIn, async (req, res) => {
   }
 });
 
-// route address ':amount'? patch or post?
-router.patch("/:categoryId/:itemId/amount", isLoggedIn, async (req, res) => {
+router.patch("/:categoryId/:itemId", isLoggedIn, async (req, res) => {
   const { categoryId, itemId } = req.params;
-  const { planned_amount } = req.body;
+  const { item_name, planned_amount } = req.body;
 
-  if (!categoryId || !itemId || !planned_amount) {
-    return res.status(400).json({ error: "All fields are required" });
+  if (!categoryId || !itemId) {
+    return res.status(400).json({ error: "Invalid category ID or item ID" });
   }
 
   try {
-    const update_q = `
-    UPDATE items 
-    SET planned_amount=? 
-    WHERE category_id=? AND id=?`;
+    let update_q = `UPDATE items SET `;
+    let values = [];
 
-    await pool.execute(update_q, [planned_amount, categoryId, itemId]);
+    if (item_name) {
+      update_q += `item_name=?, `;
+      values.push(item_name);
+    }
 
-    res.status(200).json({ planned_amount });
+    if (planned_amount) {
+      update_q += `planned_amount=? `;
+      values.push(planned_amount);
+    }
+
+    update_q = update_q + `WHERE category_id=? AND id=?`;
+    values.push(categoryId, itemId);
+
+    await pool.execute(update_q, values);
+
+    res.status(200).json({ message: "Item updated successfully" });
   } catch (e) {
     console.error("Error adding item:", e);
     return res.status(500).json({ error: "Server Error" });
@@ -89,7 +99,7 @@ router.delete("/:categoryId/:itemId", isLoggedIn, async (req, res) => {
 
   try {
     const item_exists_q = `
-    SELECT * FROM items WHERE id=? AND category_id=? AND user_id=? `;
+    SELECT * FROM items WHERE id=? AND category_id=? AND user_id=?`;
     const [existingItem] = await pool.execute(item_exists_q, [
       itemId,
       categoryId,

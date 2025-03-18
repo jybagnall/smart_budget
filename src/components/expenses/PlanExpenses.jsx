@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import AddItemButton from "../buttons/AddItemButton";
 import AddItemForm from "../forms/AddItemForm";
@@ -24,7 +24,7 @@ export default function PlanExpenses() {
     fetchCategories();
   }, []);
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       const res = await axios.get("/api/items", {
         withCredentials: true,
@@ -33,16 +33,19 @@ export default function PlanExpenses() {
     } catch (error) {
       console.error("Error fetching items:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [fetchItems]);
 
-  // understand this
   const handleShowForm = (categoryID) => {
     setSelectedCategoryID(categoryID);
     setActiveCategoryID((id) => (id === categoryID ? null : categoryID));
+  };
+
+  const handleSetCategory = (categoryID) => {
+    setSelectedCategoryID(categoryID);
   };
 
   return (
@@ -54,6 +57,7 @@ export default function PlanExpenses() {
         {categories.map((category) => (
           <li
             key={category.id}
+            onClick={() => handleSetCategory(category.id)}
             className="w-[90%] min-w-[400px] sm:w-110 md:w-90 lg:w-50 mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md min-h-60 max-h-96"
           >
             <div className="flex items-center justify-between bg-gray-50 px-4 py-2 h-12">
@@ -73,7 +77,8 @@ export default function PlanExpenses() {
                   <PlannedItem
                     key={item.id}
                     item={item}
-                    setSelectedCategoryID={setSelectedCategoryID}
+                    selectedCategoryID={selectedCategoryID}
+                    fetchItems={fetchItems}
                   />
                 ))}
 

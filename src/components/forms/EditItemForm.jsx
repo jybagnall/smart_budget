@@ -1,16 +1,25 @@
-import { useForm } from "react-hook-form";
-import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 
-export default function AddItemForm({ selectedCategoryID, fetchItems }) {
+export default function EditItemForm({
+  item,
+  selectedCategoryID,
+  handleToggleEdit,
+  fetchItems,
+}) {
   const {
     register,
     formState: { errors },
   } = useForm();
 
-  const [item_name, setItem_name] = useState("");
-  const [planned_amount, setPlanned_amount] = useState("");
-  const [lastSubmittedName, setLastSubmittedName] = useState("");
+  const [item_name, setItem_name] = useState(item.item_name);
+  const [planned_amount, setPlanned_amount] = useState(item.planned_amount);
+  const [lastSubmittedName, setLastSubmittedName] = useState(item.item_name);
+  const [lastSubmittedAmount, setLastSubmittedAmount] = useState(
+    item.planned_amount
+  );
+
   const [submitTimeoutID, setSubmitTimeoutID] = useState(null);
 
   const itemRef = useRef(null);
@@ -22,21 +31,26 @@ export default function AddItemForm({ selectedCategoryID, fetchItems }) {
     setSubmitTimeoutID(
       setTimeout(async () => {
         if (!item_name || !planned_amount || !selectedCategoryID) return;
-        if (item_name === lastSubmittedName) return;
+
+        if (
+          item_name === lastSubmittedName &&
+          planned_amount === lastSubmittedAmount
+        )
+          return;
 
         try {
-          const res = await axios.post(
-            `/api/items/${selectedCategoryID}`,
+          const res = await axios.patch(
+            `/api/items/${selectedCategoryID}/${item.id}`,
             { item_name, planned_amount },
             {
               withCredentials: true,
             }
           );
 
-          if (res.status === 201) {
-            setItem_name("");
-            setPlanned_amount("");
+          if (res.status === 200) {
             setLastSubmittedName(item_name);
+            setLastSubmittedAmount(planned_amount);
+            handleToggleEdit();
             fetchItems();
           }
         } catch (e) {
@@ -44,12 +58,6 @@ export default function AddItemForm({ selectedCategoryID, fetchItems }) {
         }
       }, 500)
     );
-
-    if (item_name.length >= 2 && !planned_amount) {
-      amountRef.current?.focus();
-    } else if (planned_amount.length >= 2 && !item_name) {
-      itemRef.current?.focus();
-    }
   };
 
   return (
@@ -63,8 +71,7 @@ export default function AddItemForm({ selectedCategoryID, fetchItems }) {
             type="text"
             name="item_name"
             id="item_name"
-            className="w-full gap-x-1 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:rounded-md focus:-outline-offset-1 focus:outline-indigo-600 bg-white text-base text-gray-900 placeholder:text-gray-400 sm:text-sm"
-            placeholder="Type an expense item"
+            className="w-full gap-x-1 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:rounded-md focus:-outline-offset-1 focus:outline-indigo-600 bg-white text-base text-gray-900 sm:text-sm"
             value={item_name}
             ref={itemRef}
             onChange={(e) => setItem_name(e.target.value)}
@@ -94,8 +101,7 @@ export default function AddItemForm({ selectedCategoryID, fetchItems }) {
             type="number"
             name="planned_amount"
             id="planned_amount"
-            className="w-full pl-0 pr-1 border-none bg-transparent text-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2  focus:ring-indigo-600 focus:rounded-md text-right"
-            placeholder="0.00"
+            className="w-full pl-0 pr-1 border-none bg-transparent text-gray-900 sm:text-sm focus:outline-none focus:ring-2  focus:ring-indigo-600 focus:rounded-md text-right"
             style={{
               appearance: "none",
               MozAppearance: "textfield",

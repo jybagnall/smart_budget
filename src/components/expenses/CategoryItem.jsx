@@ -7,7 +7,10 @@ export default function CategoryItem({ handleDelete, id, category_name }) {
         {category_name}
       </label>
       <div>
-        <DeleteSVGButton onClick={() => handleDelete(id)} />
+        <DeleteSVGButton
+          onClick={() => handleDelete(id)}
+          aria-label={`Delete ${category_name}`}
+        />
       </div>
     </div>
   );

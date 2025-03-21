@@ -2,7 +2,6 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 
-const pool = require("../config/db");
 const { isLoggedIn } = require("../middleware");
 const { checkUserBudget } = require("../helpers/budgetStatus");
 
@@ -22,18 +21,14 @@ router.get(
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const userId = req.user.id;
-      const { thisMonthBudget, futureBudget } = await checkUserBudget(userId);
+      const { budget_exists } = await checkUserBudget(req.user.id);
 
       let redirectUrl;
 
-      if (thisMonthBudget) {
-        redirectUrl = process.env.FRONTEND_URL + "/plan-expenses";
-      } else if (futureBudget) {
-        redirectUrl = process.env.FRONTEND_URL + "/plan-expenses";
-        // redirectUrl = `${process.env.FRONTEND_URL}/expense-status?year=${futureBudget.year}&month=${futureBudget.month}`;
-      } else {
+      if (budget_exists === null) {
         redirectUrl = process.env.FRONTEND_URL + "/set-budgets";
+      } else {
+        redirectUrl = process.env.FRONTEND_URL + "/plan-expenses";
       }
 
       res.redirect(redirectUrl);
@@ -63,27 +58,6 @@ router.get("/user", (req, res) => {
   }
 
   return res.json({ user: req.user });
-});
-
-router.get("/check-budget", isLoggedIn, async (req, res) => {
-  const userId = req.user.id;
-
-  try {
-    const budget_exists_q =
-      "SELECT target_amount FROM budgets JOIN dates ON budgets.date_id = dates.id WHERE budgets.user_id=? AND dates.year= YEAR(CURDATE()) AND dates.month = MONTH(CURDATE())";
-
-    const [budget] = await pool.execute(budget_exists_q, [userId]);
-
-    if (budget.length > 0) {
-      return res.json({ hasBudget: true });
-    } else {
-      return res.json({ hasBudget: false });
-    }
-  } catch (e) {
-    console.error("Error checking budget:", e);
-
-    return res.status(500).json({ message: "Server Error" });
-  }
 });
 
 module.exports = router;

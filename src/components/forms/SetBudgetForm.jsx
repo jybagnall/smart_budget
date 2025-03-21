@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import axios from "axios";
 
-import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import MonthSelector from "../MonthSelector";
 
-export default function TargetSpendingForm() {
+export default function SetBudgetForm() {
   const {
     register,
     handleSubmit,
@@ -14,8 +14,24 @@ export default function TargetSpendingForm() {
 
   const navigate = useNavigate();
 
-  const { targetMonth, currentYear, setTargetMonth, getMonthName } =
-    useTargetMonth();
+  const today = new Date(); // do I need this?
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+
+  const [targetMonth, setTargetMonth] = useState(currentMonth); // 0, 1..
+
+  let adjustedYear = targetMonth < currentMonth ? currentYear + 1 : currentYear;
+
+  if (adjustedYear === currentYear && targetMonth < currentMonth) {
+    alert("You cannot set a budget for past month.");
+    return;
+  }
+
+  const getMonthName = (monthIndex) => {
+    return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+      new Date(adjustedYear, monthIndex)
+    );
+  };
 
   const handlePrevMonth = () =>
     setTargetMonth((month) => (month === 0 ? 11 : month - 1));
@@ -25,7 +41,7 @@ export default function TargetSpendingForm() {
 
   const onSubmit = async (data) => {
     const payload = {
-      year: currentYear,
+      year: adjustedYear,
       month: targetMonth + 1,
       target_amount: data.targetSpending,
     };

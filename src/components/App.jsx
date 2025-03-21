@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 
-import TargetSpendingForm from "./forms/TargetSpendingForm";
+import SetBudgetForm from "./forms/SetBudgetForm";
 import Login from "../components/Login";
 import Homepage from "./Homepage";
 import PageNotFound from "./alerts/PageNotFound";
@@ -13,7 +13,7 @@ function App() {
     <Routes>
       <Route index element={<Homepage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/set-budgets" element={<TargetSpendingForm />} />
+      <Route path="/set-budgets" element={<SetBudgetForm />} />
       <Route path="/expense-status" element={<ExpenseStatus />} />
       <Route path="/category-list" element={<CategoryList />} />
       <Route path="/plan-expenses" element={<PlanExpenses />} />

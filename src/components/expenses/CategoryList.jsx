@@ -1,50 +1,68 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 import AddCategoryForm from "../forms/AddCategoryForm";
 import CategoryItem from "./CategoryItem";
 import NavigationButton from "../buttons/NavigationButton";
+import Loading from "../alerts/Loading";
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
 
 export default function CategoryList() {
   const [categories, setCategories] = useState([]);
+  const { dateId, isLoading } = useTargetMonth();
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
+    if (!dateId) return; // prevent unnecessary api calls
+
     try {
-      const res = await axios.get("/api/categories", {
+      const res = await axios.get(`/api/categories?dateId=${dateId}`, {
         withCredentials: true,
       });
       setCategories(res.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
-  };
- 
+  }, [dateId]);
+
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (dateId) {
+      fetchCategories();
+    }
+  }, [dateId, fetchCategories]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   const handleAdd = async (category_name) => {
     try {
       await axios.post(
-        "/api/categories",
-        { category_name: category_name.trim() },
+        `/api/categories`,
+        { category_name: category_name.trim(), dateId },
         { withCredentials: true }
       );
 
-      fetchCategories();
+      await fetchCategories();
     } catch (error) {
       console.error("Error adding category:", error);
     }
   };
 
   const handleDelete = async (categoryId) => {
+    const rollbackCategories = [...categories];
+
+    setCategories((categories) =>
+      categories.filter((c) => c.id !== categoryId)
+    );
+
     try {
       await axios.delete(`/api/categories/${categoryId}`, {
         withCredentials: true,
       });
-      fetchCategories();
     } catch (e) {
-      console.error("Error adding category:", e);
+      console.error("Error deleting category:", e);
+      setCategories(rollbackCategories);
+      // alert("Failed to delete category. Please try again.");
     }
   };
 
@@ -58,10 +76,7 @@ export default function CategoryList() {
           Add your expense categories
         </label>
 
-        <AddCategoryForm
-          fetchCategories={fetchCategories}
-          handleAdd={handleAdd}
-        />
+        <AddCategoryForm handleAdd={handleAdd} />
 
         {/* boder */}
         <div className="flex items-center justify-between space-x-3 mt-4 border-t border-gray-200 px-2 py-2 sm:px-3"></div>

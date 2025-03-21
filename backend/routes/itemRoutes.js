@@ -22,6 +22,28 @@ router.get("", isLoggedIn, async (req, res) => {
   }
 });
 
+router.get("/expense-status", isLoggedIn, async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+    const q = `
+      SELECT categories.category_name AS category_name,
+      COALESCE(SUM(items.planned_amount), 0) AS sum_per_category
+      FROM categories
+      LEFT JOIN items ON categories.id = items.category_id
+      AND items.user_id=?
+      WHERE categories.user_id=?
+      GROUP BY categories.id, category_name
+    `;
+
+    const [results] = await pool.execute(q, [user_id, user_id]);
+
+    res.json(results);
+  } catch (e) {
+    console.error("failed to fetch categories", e);
+    res.status(500).json({ error: e.message });
+  }
+});
 // '/:item_name' or '/item_name'
 router.post("/:categoryId", isLoggedIn, async (req, res) => {
   const user_id = req.user.id;

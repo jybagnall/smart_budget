@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import SaveSVGButton from "../buttons/SaveSVGButton";
+import CancelSVGButton from "../buttons/CancelSVGButton";
 
 export default function EditItemForm({ item, handleToggleEdit, setItems }) {
   const {
@@ -15,6 +16,12 @@ export default function EditItemForm({ item, handleToggleEdit, setItems }) {
 
   const [item_name, setItem_name] = useState(item.item_name);
   const [planned_amount, setPlanned_amount] = useState(item.planned_amount);
+
+  const handleCancel = () => {
+    setItem_name(item.item_nam);
+    setPlanned_amount(item.planned_amount);
+    handleToggleEdit();
+  };
 
   const onSubmit = async (data) => {
     const updatedItem = {
@@ -114,6 +121,7 @@ export default function EditItemForm({ item, handleToggleEdit, setItems }) {
         </div>
 
         <SaveSVGButton />
+        <CancelSVGButton onClick={handleCancel} />
       </form>
     </div>
   );

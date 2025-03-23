@@ -8,10 +8,11 @@ import { useTargetMonth } from "../../contexts/TargetMonthContext";
 export default function PlanExpenses() {
   const { dateId } = useTargetMonth();
   const [categories, setCategories] = useState([]);
-
   const [items, setItems] = useState([]);
-  const [activeCategoryID, setActiveCategoryID] = useState(null);
+
+  const [addingCategoryID, setAddingCategoryID] = useState(null);
   const [editID, setEditID] = useState(null);
+  const [addFormClicked, setAddFormClicked] = useState(false);
 
   const fetchCategories = useCallback(async () => {
     if (!dateId) return;
@@ -52,7 +53,9 @@ export default function PlanExpenses() {
   }, [dateId, fetchItems]);
 
   const handleShowForm = (categoryID) => {
-    setActiveCategoryID((prevID) =>
+    setEditID(null);
+    setAddFormClicked(true);
+    setAddingCategoryID((prevID) =>
       prevID === categoryID ? null : categoryID
     );
   };
@@ -66,7 +69,7 @@ export default function PlanExpenses() {
         {categories.map((category) => (
           <li
             key={category.id}
-            onClick={() => setActiveCategoryID(category.id)}
+            onClick={() => setAddingCategoryID(category.id)}
             className="w-[90%] min-w-[400px] sm:w-110 md:w-90 lg:w-50 mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md min-h-60 max-h-96"
           >
             <div className="flex items-center justify-between bg-gray-50 px-4 py-2 h-12">
@@ -88,24 +91,29 @@ export default function PlanExpenses() {
                     item={item}
                     fetchItems={fetchItems}
                     setItems={setItems}
-                    setActiveCategoryID={setActiveCategoryID}
+                    setAddingCategoryID={setAddingCategoryID}
                     editID={editID}
                     setEditID={setEditID}
                   />
                 ))}
 
-              {activeCategoryID === category.id && editID === null && (
-                <AddItemForm
-                  key={category.id}
-                  selectedCategoryID={category.id}
-                  fetchItems={fetchItems}
-                  setItems={setItems}
-                />
-              )}
+              {addingCategoryID === category.id &&
+                editID === null &&
+                addFormClicked && (
+                  <AddItemForm
+                    key={category.id}
+                    selectedCategoryID={category.id}
+                    fetchItems={fetchItems}
+                    setItems={setItems}
+                    setAddFormClicked={setAddFormClicked}
+                  />
+                )}
 
-              <div className="flex justify-start py-5">
-                <AddItemButton onClick={() => handleShowForm(category.id)} />
-              </div>
+              {addingCategoryID !== category.id && editID === null && (
+                <div className="flex justify-start py-5">
+                  <AddItemButton onClick={() => handleShowForm(category.id)} />
+                </div>
+              )}
             </dl>
           </li>
         ))}

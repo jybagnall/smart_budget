@@ -1,6 +1,10 @@
 export default function SaveSVGButton() {
   return (
-    <button type="submit" className="p-2 text-green-600 hover:text-green-500">
+    <button
+      type="submit"
+      title="save"
+      className="p-2 text-green-600 hover:text-green-500"
+    >
       <svg
         className="w-4 h-4"
         fill="none"

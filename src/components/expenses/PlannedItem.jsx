@@ -9,22 +9,21 @@ export default function PlannedItem({
   item,
   fetchItems,
   setItems,
-  setActiveCategoryID,
+  setAddingCategoryID,
+  editID,
   setEditID,
 }) {
-  const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   const { dateId } = useTargetMonth();
 
+  const isEditing = editID === item.id;
+
   const handleToggleEdit = () => {
-    setActiveCategoryID(null);
-    setIsEditing((isEditing) => {
-      const newEditState = !isEditing;
-      setEditID(newEditState ? item.id : null);
-      return newEditState;
-    });
-  };
+    setAddingCategoryID(null);
+
+    setEditID(editID === item.id ? null : item.id);
+  }; // exit or enter edit mode.
 
   const handleDelete = async (itemID) => {
     setItems((items) => items.filter((item) => item.id !== itemID));
@@ -85,10 +84,3 @@ export default function PlannedItem({
     </>
   );
 }
-
-// Tooltip
-// {isTrashHovered && (
-//   <div className="absolute right-full top-1/2 -translate-y-1/2 mr-2 px-2 py-1 text-xs text-white bg-gray-700 rounded-md shadow-md whitespace-nowrap">
-//     Remove this expense item
-//   </div>
-// )}

@@ -4,7 +4,7 @@ export default function NavigationButton({ to, children }) {
   return (
     <NavLink
       to={to}
-      className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm font-semibold text-teal-700 shadow-xs hover:text-teal-600"
+      className="inline-flex items-center gap-x-1.5 rounded-md px-2.5 py-1.5 text-sm font-semibold text-teal-700 hover:text-teal-600 focus:outline-none focus:ring-0 border-none shadow-none bg-transparent"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -1,52 +1,60 @@
 import { useState, useEffect, useCallback } from "react";
-import { NavLink } from "react-router-dom";
 import axios from "axios";
 import AddItemButton from "../buttons/AddItemButton";
 import AddItemForm from "../forms/AddItemForm";
 import PlannedItem from "./PlannedItem";
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
 
 export default function PlanExpenses() {
+  const { dateId } = useTargetMonth();
   const [categories, setCategories] = useState([]);
-  const [selectedCategoryID, setSelectedCategoryID] = useState(null);
+
   const [items, setItems] = useState([]);
   const [activeCategoryID, setActiveCategoryID] = useState(null);
+  const [editID, setEditID] = useState(null);
+
+  const fetchCategories = useCallback(async () => {
+    if (!dateId) return;
+
+    try {
+      const res = await axios.get(`/api/categories?dateId=${dateId}`, {
+        withCredentials: true,
+      });
+      setCategories(res.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }, [dateId]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get("/api/categories", {
-          withCredentials: true,
-        });
-        setCategories(res.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
+    if (dateId) {
+      fetchCategories();
+    }
+  }, [dateId, fetchCategories]);
 
   const fetchItems = useCallback(async () => {
+    if (!dateId) return;
+
     try {
-      const res = await axios.get("/api/items", {
+      const res = await axios.get(`/api/items?dateId=${dateId}`, {
         withCredentials: true,
       });
       setItems(res.data || []);
     } catch (error) {
       console.error("Error fetching items:", error);
     }
-  }, []);
+  }, [dateId]);
 
   useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+    if (dateId) {
+      fetchItems();
+    }
+  }, [dateId, fetchItems]);
 
   const handleShowForm = (categoryID) => {
-    setSelectedCategoryID(categoryID);
-    setActiveCategoryID((id) => (id === categoryID ? null : categoryID));
-  };
-
-  const handleSetCategory = (categoryID) => {
-    setSelectedCategoryID(categoryID);
+    setActiveCategoryID((prevID) =>
+      prevID === categoryID ? null : categoryID
+    );
   };
 
   return (
@@ -58,7 +66,7 @@ export default function PlanExpenses() {
         {categories.map((category) => (
           <li
             key={category.id}
-            onClick={() => handleSetCategory(category.id)}
+            onClick={() => setActiveCategoryID(category.id)}
             className="w-[90%] min-w-[400px] sm:w-110 md:w-90 lg:w-50 mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md min-h-60 max-h-96"
           >
             <div className="flex items-center justify-between bg-gray-50 px-4 py-2 h-12">
@@ -78,19 +86,24 @@ export default function PlanExpenses() {
                   <PlannedItem
                     key={item.id}
                     item={item}
-                    selectedCategoryID={selectedCategoryID}
                     fetchItems={fetchItems}
+                    setItems={setItems}
+                    setActiveCategoryID={setActiveCategoryID}
+                    editID={editID}
+                    setEditID={setEditID}
                   />
                 ))}
 
-              {category.id === activeCategoryID && (
+              {activeCategoryID === category.id && editID === null && (
                 <AddItemForm
-                  selectedCategoryID={selectedCategoryID}
+                  key={category.id}
+                  selectedCategoryID={category.id}
                   fetchItems={fetchItems}
+                  setItems={setItems}
                 />
               )}
 
-              <div className="flex justify-start py-3">
+              <div className="flex justify-start py-5">
                 <AddItemButton onClick={() => handleShowForm(category.id)} />
               </div>
             </dl>
@@ -99,13 +112,4 @@ export default function PlanExpenses() {
       </ul>
     </div>
   );
-}
-
-{
-  /* <div className="flex justify-between gap-x-4 py-3">
-<dt className="text-gray-500">Amount</dt>
-<dd className="flex items-start gap-x-2">
-  <div className="font-medium text-gray-900">$ amount</div>
-</dd>
-</div> */
 }

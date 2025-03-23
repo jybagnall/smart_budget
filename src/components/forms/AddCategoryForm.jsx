@@ -8,7 +8,11 @@ export default function AddCategoryForm({ handleAdd }) {
     handleSubmit,
     reset,
     formState: { errors },
+    watch,
   } = useForm();
+
+  //the live input value
+  const categoryValue = watch("category_name", "");
 
   const onSubmit = async (data) => {
     try {
@@ -36,7 +40,7 @@ export default function AddCategoryForm({ handleAdd }) {
             className="block rounded-md w-full focus:outline-none bg-gray-50 py-2 px-3 text-base text-gray-900 placeholder:text-gray-400 sm:text-sm"
             placeholder="Category name (ex. Food)"
           />
-          {errors.category_name && (
+          {errors.category_name && categoryValue.trim() === "" && (
             <span className="mt-2 text-xs text-red-600">
               {errors.category_name.message}
             </span>

@@ -3,23 +3,44 @@ import axios from "axios";
 
 import TrashIcon from "../buttons/TrashIcon";
 import EditItemForm from "../forms/EditItemForm";
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
 
-export default function PlannedItem({ selectedCategoryID, item, fetchItems }) {
+export default function PlannedItem({
+  item,
+  fetchItems,
+  setItems,
+  setActiveCategoryID,
+  setEditID,
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  const { dateId } = useTargetMonth();
+
   const handleToggleEdit = () => {
-    setIsEditing((isEditing) => !isEditing);
+    setActiveCategoryID(null);
+    setIsEditing((isEditing) => {
+      const newEditState = !isEditing;
+      setEditID(newEditState ? item.id : null);
+      return newEditState;
+    });
   };
 
-  const handleDelete = async (categoryID, itemID) => {
+  const handleDelete = async (itemID) => {
+    setItems((items) => items.filter((item) => item.id !== itemID));
+
     try {
-      await axios.delete(`/api/items/${categoryID}/${itemID}`, {
+      const res = await axios.delete(`/api/items/${itemID}`, {
+        data: { dateId },
         withCredentials: true,
       });
-      fetchItems();
+
+      if (res.status !== 200) {
+        await fetchItems();
+      }
     } catch (e) {
       console.error("Error deleting item", e);
+      await fetchItems();
     }
   };
 
@@ -28,13 +49,11 @@ export default function PlannedItem({ selectedCategoryID, item, fetchItems }) {
       {isEditing ? (
         <EditItemForm
           item={item}
-          selectedCategoryID={selectedCategoryID}
-          fetchItems={fetchItems}
           handleToggleEdit={handleToggleEdit}
+          setItems={setItems}
         />
       ) : (
         <div
-          key={item.id}
           onClick={handleToggleEdit}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -53,7 +72,7 @@ export default function PlannedItem({ selectedCategoryID, item, fetchItems }) {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              handleDelete(item.category_id, item.id);
+              handleDelete(item.id);
             }}
             className={`absolute right-0 transition-opacity duration-200 ${
               isHovered ? "opacity-100" : "opacity-0"

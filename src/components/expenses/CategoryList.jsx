@@ -67,7 +67,7 @@ export default function CategoryList() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="bg-neutral-50 min-h-screen flex justify-center py-30">
       <div className="w-full max-w-md bg-white p-4 rounded-lg shadow-md">
         <label
           htmlFor="category"
@@ -88,7 +88,7 @@ export default function CategoryList() {
             handleDelete={handleDelete}
           />
         ))}
-        <div className="mt-3">
+        <div className="mt-10">
           <NavigationButton to={"/plan-expenses"}>
             Navigate to add items
           </NavigationButton>

@@ -1,69 +1,67 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
+import SaveSVGButton from "../buttons/SaveSVGButton";
 
-export default function EditItemForm({
-  item,
-  selectedCategoryID,
-  handleToggleEdit,
-  fetchItems,
-}) {
+export default function EditItemForm({ item, handleToggleEdit, setItems }) {
   const {
     register,
     formState: { errors },
+    handleSubmit,
   } = useForm();
+
+  const { dateId } = useTargetMonth();
 
   const [item_name, setItem_name] = useState(item.item_name);
   const [planned_amount, setPlanned_amount] = useState(item.planned_amount);
-  const [lastSubmittedName, setLastSubmittedName] = useState(item.item_name);
-  const [lastSubmittedAmount, setLastSubmittedAmount] = useState(
-    item.planned_amount
-  );
 
-  const [submitTimeoutID, setSubmitTimeoutID] = useState(null);
+  const onSubmit = async (data) => {
+    const updatedItem = {
+      item_name: data.item_name,
+      planned_amount: data.planned_amount,
+      dateId,
+    };
 
-  const itemRef = useRef(null);
-  const amountRef = useRef(null);
-
-  const handleBlur = () => {
-    if (submitTimeoutID) clearTimeout(submitTimeoutID);
-
-    setSubmitTimeoutID(
-      setTimeout(async () => {
-        if (!item_name || !planned_amount || !selectedCategoryID) return;
-
-        if (
-          item_name === lastSubmittedName &&
-          planned_amount === lastSubmittedAmount
-        )
-          return;
-
-        try {
-          const res = await axios.patch(
-            `/api/items/${selectedCategoryID}/${item.id}`,
-            { item_name, planned_amount },
-            {
-              withCredentials: true,
-            }
-          );
-
-          if (res.status === 200) {
-            setLastSubmittedName(item_name);
-            setLastSubmittedAmount(planned_amount);
-            handleToggleEdit();
-            fetchItems();
-          }
-        } catch (e) {
-          console.error(e);
+    try {
+      const res = await axios.patch(
+        `/api/items/${item.category_id}/${item.id}`,
+        updatedItem,
+        {
+          withCredentials: true,
         }
-      }, 500)
-    );
+      );
+
+      if (res.status === 200) {
+        setItems((items) =>
+          items.map((mappedItem) =>
+            mappedItem.id === item.id
+              ? { ...mappedItem, item_name, planned_amount }
+              : mappedItem
+          )
+        );
+        handleToggleEdit();
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
     <div className="py-1">
-      <form className="flex justify-between items-center w-full gap-x-4 px-1 py-1">
-        <div className="flex-1">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex justify-between items-center w-full gap-x-4 px-1 py-1"
+      >
+        <div
+          className={`w-full px-2 py-1 rounded-md
+          ${
+            errors.item_name
+              ? "border border-red-500"
+              : "border border-gray-300"
+          } 
+          bg-white`}
+        >
           <input
             {...register("item_name", {
               required: "*Please enter the category name",
@@ -71,25 +69,25 @@ export default function EditItemForm({
             type="text"
             name="item_name"
             id="item_name"
-            className="w-full gap-x-1 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:rounded-md focus:-outline-offset-1 focus:outline-indigo-600 bg-white text-base text-gray-900 sm:text-sm"
+            className="w-full text-base text-gray-900 placeholder:text-gray-400 
+            bg-transparent border-none outline-none focus:ring-0 focus:bg-white"
             value={item_name}
-            ref={itemRef}
-            onChange={(e) => setItem_name(e.target.value)}
-            onBlur={handleBlur}
-            autoFocus
+            onChange={(e) => {
+              setItem_name(e.target.value);
+            }}
           />
         </div>
 
-        <div className="relative w-32 left-3 bg-white">
-          <span
-            className="text-gray-500 absolute top-1/2 transform -translate-y-1/2 transition-all"
-            style={{
-              left:
-                planned_amount.length > 0
-                  ? `${1 + planned_amount.length * 0.5}ch`
-                  : "0.5ch",
-            }}
-          >
+        <div
+          className={`relative w-32 left-3 flex items-center px-2 py-1 rounded-md
+          ${
+            errors.planned_amount
+              ? "border border-red-500"
+              : "border border-gray-300"
+          }
+          bg-white`}
+        >
+          <span className="text-gray-500 select-none pointer-events-none">
             $
           </span>
           <input
@@ -101,7 +99,7 @@ export default function EditItemForm({
             type="number"
             name="planned_amount"
             id="planned_amount"
-            className="w-full pl-0 pr-1 border-none bg-transparent text-gray-900 sm:text-sm focus:outline-none focus:ring-2  focus:ring-indigo-600 focus:rounded-md text-right"
+            className="w-full pl-2 text-right bg-transparent text-lg text-gray-900 placeholder-gray-400 border-none outline-none focus:ring-0"
             style={{
               appearance: "none",
               MozAppearance: "textfield",
@@ -109,24 +107,14 @@ export default function EditItemForm({
             }}
             aria-describedby="price-currency"
             value={planned_amount}
-            ref={amountRef}
-            onChange={(e) => setPlanned_amount(e.target.value.slice(0, 6))}
-            onBlur={handleBlur}
+            onChange={(e) => {
+              setPlanned_amount(e.target.value.slice(0, 6));
+            }}
           />
         </div>
+
+        <SaveSVGButton />
       </form>
-      <div className="flex flex-col mt-1">
-        {errors.item_name && (
-          <span className="text-xs text-red-600">
-            {errors.item_name.message}
-          </span>
-        )}
-        {errors.planned_amount && (
-          <span className="text-xs text-red-600">
-            {errors.planned_amount.message}
-          </span>
-        )}
-      </div>
     </div>
   );
 }

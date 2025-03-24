@@ -69,7 +69,6 @@ export default function PlanExpenses() {
         {categories.map((category) => (
           <li
             key={category.id}
-            onClick={() => setAddingCategoryID(category.id)}
             className="w-[90%] min-w-[400px] sm:w-110 md:w-90 lg:w-50 mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md min-h-60 max-h-96"
           >
             <div className="flex items-center justify-between bg-gray-50 px-4 py-2 h-12">
@@ -106,6 +105,8 @@ export default function PlanExpenses() {
                     fetchItems={fetchItems}
                     setItems={setItems}
                     setAddFormClicked={setAddFormClicked}
+                    setAddingCategoryID={setAddingCategoryID}
+                    setEditID={setEditID}
                   />
                 )}
 

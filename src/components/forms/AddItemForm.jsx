@@ -8,6 +8,8 @@ export default function AddItemForm({
   fetchItems,
   setItems,
   setAddFormClicked,
+  setAddingCategoryID,
+  setEditID
 }) {
   const {
     register,
@@ -76,6 +78,8 @@ export default function AddItemForm({
           setLastSubmittedName(item_name);
           setLastSubmittedAmount(planned_amount);
           setAddFormClicked(false);
+          setEditID(null);
+          setAddingCategoryID(null);
           fetchItems();
         }
       } catch (e) {

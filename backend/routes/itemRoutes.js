@@ -13,9 +13,11 @@ router.get("", isLoggedIn, async (req, res) => {
 
   try {
     const q = `
-    SELECT * 
+    SELECT items.*
     FROM items 
-    WHERE date_id=?`;
+    JOIN categories
+    ON categories.id = items.category_id
+    WHERE categories.date_id=?`;
 
     const [results] = await pool.execute(q, [dateId]);
 
@@ -51,14 +53,13 @@ router.get("/expense-status", isLoggedIn, async (req, res) => {
 
 router.post("/:categoryId", isLoggedIn, async (req, res) => {
   const { categoryId } = req.params;
-  const { item_name, planned_amount, dateId } = req.body;
+  const { item_name, planned_amount } = req.body;
 
   if (
     !categoryId ||
     isNaN(Number(categoryId)) ||
     !item_name ||
-    !planned_amount ||
-    !dateId
+    !planned_amount
   ) {
     return res.status(400).json({
       error: "Invalid category ID, item field or missing dateId",
@@ -67,22 +68,21 @@ router.post("/:categoryId", isLoggedIn, async (req, res) => {
 
   try {
     const insert_q = `
-    INSERT INTO items (category_id, item_name, planned_amount, date_id) 
+    INSERT INTO items (category_id, user_id, item_name, planned_amount)
     VALUES (?, ?, ?, ?)`;
 
     const [result] = await pool.execute(insert_q, [
       categoryId,
+      req.user.id,
       item_name,
-      planned_amount,
-      dateId,
+      planned_amount
     ]);
 
     res.status(201).json({
       id: result.insertId,
       categoryId,
       item_name,
-      planned_amount,
-      dateId,
+      planned_amount
     });
   } catch (e) {
     console.error("Error adding item:", e);

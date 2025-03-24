@@ -1,0 +1,51 @@
+services:
+  backend:
+    build: .
+    command: npm run dev
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql # Docker service name
+      DB_USER: jiyoung
+      DB_PASS: 202486
+      DB_NAME: smart_budget
+      DB_PORT: 3306 # match .env
+      DOCKERIZED: true
+      SESSION_SECRET: JYinJinWolDong
+      FRONTEND_URL: http://localhost:5173
+      PRODUCTION_FRONTEND_URL:
+      BACKEND_URL: http://localhost:5000
+      PRODUCTION_BACKEND_URL:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: http://localhost:5000/api/auth/google/callback
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - mynetwork
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 202486
+      MYSQL_DATABASE: smart_budget
+      MYSQL_USER: jiyoung
+      MYSQL_PASSWORD: 202486
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - mynetwork
+
+volumes:
+  mysql_data:
+
+networks:
+  mynetwork:
+    driver: bridge

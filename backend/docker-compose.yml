@@ -38,6 +38,7 @@ services:
       MYSQL_DATABASE: smart_budget
       MYSQL_USER: jiyoung
       MYSQL_PASSWORD: 202486
+      ports: "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:

@@ -9,7 +9,6 @@ export default function PlannedItem({
   item,
   fetchItems,
   setItems,
-  setAddingCategoryID,
   editID,
   setEditID,
 }) {
@@ -20,8 +19,6 @@ export default function PlannedItem({
   const isEditing = editID === item.id;
 
   const handleToggleEdit = () => {
-    setAddingCategoryID(null);
-
     setEditID(editID === item.id ? null : item.id);
   }; // exit or enter edit mode.
 

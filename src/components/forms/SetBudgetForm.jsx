@@ -4,8 +4,9 @@ import { useState } from "react";
 import axios from "axios";
 
 import MonthSelector from "../MonthSelector";
+import SaveButton from "../buttons/SaveButton";
 
-export default function SetBudgetForm() {
+export default function SetBudgetForm({ isInitial }) {
   const {
     register,
     handleSubmit,
@@ -14,7 +15,7 @@ export default function SetBudgetForm() {
 
   const navigate = useNavigate();
 
-  const today = new Date(); // do I need this?
+  const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
 
@@ -76,7 +77,7 @@ export default function SetBudgetForm() {
           htmlFor="targetSpending"
           className="block text-lg font-semibold text-gray-900"
         >
-          What is your spending target for this month?
+          What is your spending target?
         </label>
 
         <div className="relative mt-4">
@@ -105,12 +106,7 @@ export default function SetBudgetForm() {
           )}
         </div>
 
-        <button
-          type="submit"
-          className="w-full rounded-md bg-green-500 px-4 py-2 text-gray-900 font-semibold hover:bg-green-600"
-        >
-          Save
-        </button>
+        <SaveButton bgColor={"bg-sky-200"} />
       </form>
     </div>
   );

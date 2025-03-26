@@ -32,6 +32,36 @@ router.get("/target-month", isLoggedIn, async (req, res) => {
   }
 });
 
+router.get(`/request-budget-month`, isLoggedIn, async (req, res) => {
+  const userId = req.user.id;
+  const { dateId } = req.query;
+
+  try {
+    const getBudgetAndMonth_q = `
+    SELECT dates.year, dates.month, budgets.target_amount
+    FROM dates
+    JOIN budgets ON budgets.date_id = dates.id
+    WHERE dates.user_id = ? AND dates.id = ?
+    LIMIT 1
+    `;
+
+    const [row] = await pool.execute(getBudgetAndMonth_q, [userId, dateId]);
+    const data = row[0];
+
+    if (!data) {
+      return res.status(404).json({ error: "No budget found for this date" });
+    }
+
+    return res.status(200).json({
+      target_amount: data.target_amount,
+      year: data.year,
+      month: data.month,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.post("/set-budgets", isLoggedIn, async (req, res) => {
   const { year, month, target_amount } = req.body;
   const userId = req.user.id;
@@ -60,6 +90,26 @@ router.post("/set-budgets", isLoggedIn, async (req, res) => {
     return res
       .status(201)
       .json({ message: "successfully inserted target spending" });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.patch("/edit-budgets", isLoggedIn, async (req, res) => {
+  const { target_amount, dateId } = req.body;
+
+  try {
+    const updateBudget_q = `
+    UPDATE budgets
+    SET target_amount = ? 
+    WHERE date_id = ?;`;
+
+    await pool.execute(updateBudget_q, [target_amount, dateId]);
+
+    return res
+      .status(200)
+      .json({ message: "successfully updated target spending" });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ message: "Server error" });

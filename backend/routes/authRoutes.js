@@ -3,7 +3,7 @@ const passport = require("passport");
 const router = express.Router();
 
 const { isLoggedIn } = require("../middleware");
-const { checkUserBudget } = require("../helpers/budgetStatus");
+const { checkInitialBudget } = require("../helpers/initialBudgetStatus");
 
 router.get(
   "/google",
@@ -21,11 +21,11 @@ router.get(
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const { budget_exists } = await checkUserBudget(req.user.id);
+      const initialBudget = await checkInitialBudget(req.user.id);
 
       let redirectUrl;
 
-      if (budget_exists === null) {
+      if (initialBudget === null) {
         redirectUrl = process.env.FRONTEND_URL + "/set-budgets";
       } else {
         redirectUrl = process.env.FRONTEND_URL + "/plan-expenses";

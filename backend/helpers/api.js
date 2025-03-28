@@ -31,3 +31,37 @@ export async function fetchCategories(dateId) {
     return [];
   }
 }
+
+export async function fetchTargetDate(dateId) {
+  if (!dateId) return;
+
+  try {
+    const res = await axios.get(`/api/dates/target-month/${dateId}`, {
+      withCredentials: true,
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching target month & year:", error);
+    return [];
+  }
+}
+
+export async function fetchAllDates() {
+  try {
+    const res = await axios.get(`/api/dates/all-dates`, {
+      withCredentials: true,
+    });
+
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching user's all dates:", error);
+    return [];
+  }
+}
+
+export function getMonthName(monthNum) {
+  return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+    new Date(2000, monthNum - 1)
+  );
+}

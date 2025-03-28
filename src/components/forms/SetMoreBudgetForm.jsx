@@ -5,7 +5,9 @@ import axios from "axios";
 
 import MonthSelector from "../MonthSelector";
 import SaveButton from "../buttons/SaveButton";
-export default function SetBudgetForm() {
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
+
+export default function SetMoreBudgetForm() {
   const {
     register,
     handleSubmit,
@@ -13,6 +15,7 @@ export default function SetBudgetForm() {
   } = useForm();
 
   const navigate = useNavigate();
+  const { refreshTargetMonth } = useTargetMonth();
 
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -52,6 +55,7 @@ export default function SetBudgetForm() {
       });
 
       if (res.status === 201 && res.data.message.includes("successfully")) {
+        await refreshTargetMonth();
         navigate("/category-list");
       }
     } catch (e) {
@@ -72,13 +76,6 @@ export default function SetBudgetForm() {
           targetMonth={targetMonth}
         />
 
-        <label
-          htmlFor="targetSpending"
-          className="block text-lg font-semibold text-gray-900"
-        >
-          What is your spending target?
-        </label>
-
         <div className="relative mt-4">
           <div className="flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 focus-within:border-indigo-500">
             <span className="text-gray-500">$</span>
@@ -95,16 +92,16 @@ export default function SetBudgetForm() {
               aria-describedby="price-currency"
             />
             <span id="price-currency" className="text-gray-500">
-              USD
+              USD 
             </span>
-          </div>
+          </div> 
           {errors.targetSpending?.message && (
             <span className="mt-2 text-xs text-red-600">
               {errors.targetSpending.message}
             </span>
           )}
-        </div>
-
+        </div> 
+ 
         <SaveButton bgColor={"bg-sky-200"} />
       </form>
     </div>

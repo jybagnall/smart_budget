@@ -4,6 +4,7 @@ import CategoryCard from "./CategoryCard";
 
 export default function PlanExpenses() {
   const { dateId } = useTargetMonth();
+  console.log(dateId)
   const { categories, items, fetchItems, setItems } = useFetchedData(dateId);
 
   return (

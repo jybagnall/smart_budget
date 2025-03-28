@@ -9,36 +9,44 @@ function TargetMonthProvider({ children }) {
   const [dateId, setDateId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchTargetMonth = async () => {
+    setIsLoading(true);
+
+    try {
+      const res = await axios.get("/api/budgets/target-month", {
+        withCredentials: true,
+      });
+
+      if (res.data.date_id) {
+        setTargetYear(res.data.year);
+        setTargetMonth(res.data.month - 1);
+        setDateId(res.data.date_id);
+      } else {
+        setTargetYear(null);
+        setTargetMonth(null);
+        setDateId(null);
+      } // new user didn't set the target month yet.
+    } catch (error) {
+      console.error("Error fetching target month:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTargetMonth = async () => {
-      setIsLoading(true);
-
-      try {
-        const res = await axios.get("/api/budgets/target-month", {
-          withCredentials: true,
-        });
-
-        if (res.data.date_id) {
-          setTargetYear(res.data.year);
-          setTargetMonth(res.data.month - 1);
-          setDateId(res.data.date_id);
-        } else {
-          setTargetYear(null);
-          setTargetMonth(null);
-          setDateId(null);
-        } // new user didn't set the target month yet.
-      } catch (error) {
-        console.error("Error fetching target month:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchTargetMonth();
   }, []);
 
   return (
     <TargetMonthContext.Provider
-      value={{ targetMonth, targetYear, dateId, isLoading }}
+      value={{
+        targetMonth,
+        targetYear,
+        dateId,
+        isLoading,
+        refreshTargetMonth: fetchTargetMonth,
+        setDateId,
+      }}
     >
       {children}
     </TargetMonthContext.Provider>

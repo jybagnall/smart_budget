@@ -12,7 +12,7 @@ export default function CategoryList() {
   const { dateId, isLoading } = useTargetMonth();
 
   const fetchCategories = useCallback(async () => {
-    if (!dateId) return; // prevent unnecessary api calls
+    if (!dateId) return;
 
     try {
       const res = await axios.get(`/api/categories?dateId=${dateId}`, {
@@ -57,6 +57,7 @@ export default function CategoryList() {
 
     try {
       await axios.delete(`/api/categories/${categoryId}`, {
+        data: { dateId },
         withCredentials: true,
       });
     } catch (e) {
@@ -67,7 +68,7 @@ export default function CategoryList() {
   };
 
   return (
-    <div className="bg-neutral-50 min-h-screen flex justify-center py-30">
+    <div className="bg-white min-h-screen flex justify-center py-30">
       <div className="w-full max-w-md bg-white p-4 rounded-lg shadow-md">
         <label
           htmlFor="category"

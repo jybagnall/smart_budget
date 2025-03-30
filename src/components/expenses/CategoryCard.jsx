@@ -19,7 +19,7 @@ export default function CategoryCard({
   return (
     <li
       key={category.id}
-      className="w-[90%] min-w-[400px] sm:w-110 md:w-90 lg:w-50 mx-auto overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md min-h-60 max-h-96 flex flex-col"
+      className="w-full max-w-md h-[250px] mx-auto rounded-xl border border-gray-200 bg-white shadow-md flex flex-col"
     >
       <div className="flex items-center justify-between bg-gray-50 px-4 py-2 h-12">
         <div className="text-sm/6 font-medium text-green-700">
@@ -27,11 +27,11 @@ export default function CategoryCard({
         </div>
 
         <div className="relative ml-auto">
-          <div className="-m-2.5 block p-2.5 text-gray-400">Planned</div>
+          <div className="-m-2.5 block p-2.5 text-gray-400">Spent</div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-4 py-2">
         <dl className="-my-3 divide-y divide-gray-100 px-4 py-2 text-sm/6">
           {itemsPerCategory.map((item) => (
             <PlannedItem

@@ -27,6 +27,7 @@ export default function SetBudgetForm() {
     return;
   }
 
+  // import this function
   const getMonthName = (monthIndex) => {
     return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
       new Date(adjustedYear, monthIndex)

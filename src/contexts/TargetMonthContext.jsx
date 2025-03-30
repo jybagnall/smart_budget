@@ -33,6 +33,20 @@ function TargetMonthProvider({ children }) {
     }
   };
 
+  const refreshTargetMonth = async ({ id, year, month }) => {
+    setIsLoading(true);
+
+    try {
+      setDateId(id);
+      setTargetYear(year);
+      setTargetMonth(month);
+    } catch (error) {
+      console.error("Error refreshing target month:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchTargetMonth();
   }, []);
@@ -44,7 +58,8 @@ function TargetMonthProvider({ children }) {
         targetYear,
         dateId,
         isLoading,
-        refreshTargetMonth: fetchTargetMonth,
+        fetchTargetMonth,
+        refreshTargetMonth,
         setDateId,
       }}
     >

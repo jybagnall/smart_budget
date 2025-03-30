@@ -10,7 +10,7 @@ import ExpenseStatus from "./expenses/ExpenseStatus";
 import PlanExpenses from "./expenses/PlanExpenses";
 import Settings from "../components/Settings";
 import SetMoreBudgetForm from "./forms/SetMoreBudgetForm";
-
+import RootLayout from "../_components/RootLayout";
 import Navbar from "../_components/Navbar";
 
 function App() {
@@ -19,15 +19,15 @@ function App() {
       <Route index element={<Homepage />} />
       <Route path="/login" element={<Login />} />
 
-      <Route element={<Navbar />}>
-      <Route path="/set-budgets" element={<SetBudgetForm />} />
-      <Route path="/edit-budgets" element={<EditBudgetForm />} />
-      <Route path="/set-more-budgets" element={<SetMoreBudgetForm />} />
+      <Route element={<RootLayout />}>
+        <Route path="/set-budgets" element={<SetBudgetForm />} />
+        <Route path="/edit-budgets" element={<EditBudgetForm />} />
+        <Route path="/set-more-budgets" element={<SetMoreBudgetForm />} />
 
-      <Route path="/expense-status" element={<ExpenseStatus />} />
-      <Route path="/category-list" element={<CategoryList />} />
-      <Route path="/plan-expenses" element={<PlanExpenses />} />
-      <Route path="/settings" element={<Settings />} />
+        <Route path="/expense-status" element={<ExpenseStatus />} />
+        <Route path="/category-list" element={<CategoryList />} />
+        <Route path="/plan-expenses" element={<PlanExpenses />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />

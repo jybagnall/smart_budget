@@ -2,71 +2,113 @@ import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { PieChart } from "react-minimal-pie-chart";
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
+import Loading from "../alerts/Loading";
+import {
+  calculatePerCategory,
+  calculateGrossSpending,
+  fetchTargetSpending,
+} from "../../../backend/helpers/api";
 
 export default function ExpenseStatus() {
-  const [categories, setCategories] = useState([]);
-  const [totalBudget, setTotalBudget] = useState(0);
+  const { dateId, isLoading } = useTargetMonth();
+  const [sumPerCategory, setSumPerCategory] = useState([]);
+  const [totalSpending, setTotalSpending] = useState(null);
+  const [targetBudget, setTargetBudget] = useState(null);
 
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get("/api/items/expense-status", {
-        withCredentials: true,
-      });
+  const [selected, setSelected] = useState(null);
+  const [hovered, setHovered] = useState(null);
 
-      const current_planned_budget_total = res.data.reduce(
-        (sum, category) => sum + parseFloat(category.sum_per_category || 0),
-        0
-      );
-      setTotalBudget(current_planned_budget_total);
-      setCategories(res.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+  async function loadData() {
+    const fetchedPerCategory = await calculatePerCategory(dateId);
+    const fetchedGrossSpending = await calculateGrossSpending(dateId);
+    const fetchedBudget = await fetchTargetSpending(dateId);
+
+    if (fetchedPerCategory) {
+      setSumPerCategory(fetchedPerCategory);
     }
-  };
+    setTotalSpending(fetchedGrossSpending);
+    setTargetBudget(fetchedBudget.target_amount);
+  }
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (!dateId) return;
 
-  const colors = ["#E38627", "#C13C37", "#96a6df", "#00A36C", "#FF5733"];
+    loadData();
+  }, [dateId]);
 
-  const chartData = categories.map((category, index) => ({
-    title: category.category_name,
-    value: parseFloat(category.sum_per_category || 0),
-    percentage: totalBudget
-      ? (parseFloat(category.sum_per_category || 0) / totalBudget) * 100
-      : 0,
-    color: colors[index % colors.length],
-  }));
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  const colors = [
+    "#d9f99d",
+    "#8fc5de",
+    "#f5d0fe",
+    "#f9a8d4",
+    "#ffe4e6",
+    "#a9b6e8",
+    "#f4f1d5",
+    "#fed7aa",
+  ];
+  const lineWidth = 60;
+
+  const chartData = sumPerCategory.map((category, index) => {
+    const baseColor = colors[index % colors.length];
+    const ishovered = hovered === index;
+    const value = parseFloat(category.total_per_category || 0);
+    // const categoryPercentage = targetBudget ? (value/targetBudget) * 100 : 0;
+
+    return {
+      title: category.category_name,
+      value,
+      color: ishovered ? "#fafaf9" : baseColor,
+    };
+  });
+
+  const labelStyle = {
+    fontSize: "4px",
+    fontFamily: '"Nunito Sans", -apple-system, Helvetica, Arial, sans-serif',
+    fill: "#333",
+    fontWeight: "bold",
+  };
 
   return (
     <div>
-      <PieChart
-        data={chartData}
-        lineWidth={70} // Adjusts thickness of the chart
-        radius={15} // Adjusts the pie chart size within the container
-        label={({ dataEntry }) => `${Math.round(dataEntry.percentage)}%`} // Show percentage labels
-        labelStyle={{
-          fontSize: "8px",
-          fontFamily: "sans-serif",
-          fill: "#fff",
-        }}
-        labelPosition={70} // Ensures labels are inside
-        animate={true} // Enables animation
-        animationDuration={1000} // 1-second animation
-        animationEasing="ease-out"
-        startAngle={-90} // Starts from top
-        lengthAngle={360} // Full-circle chart
-        paddingAngle={3} // Adds spacing between segments
-        rounded // Rounds segment edges
-        segmentsShift={(index) => (index === 1 ? 3 : 1)} // Slight shift for effect
-      />
-      <NavLink
-        to="/category-list"
-        className="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-      >
-        Add a new category
-      </NavLink>
+      {/* <div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div> */}
+      {chartData.length === 0 || chartData.every((d) => d.value === 0) ? (
+        <p className="text-gray-500">No data available</p>
+      ) : (
+        <PieChart
+          data={chartData}
+          radius={42}
+          style={{
+            fontFamily:
+              '"Nunito Sans", -apple-system, Helvetica, Arial, sans-serif',
+            fontSize: "8px",
+          }}
+          lineWidth={lineWidth}
+          label={({ dataEntry }) => dataEntry.title}
+          labelStyle={labelStyle}
+          labelPosition={112 - lineWidth / 2}
+          segmentsStyle={{ transition: "stroke .3s", cursor: "pointer" }}
+          segmentsShift={(index) => (index === selected ? 6 : 1)}
+          animate
+          onClick={(_, index) => {
+            setSelected(index === selected ? undefined : index);
+          }}
+          onMouseOver={(_, index) => {
+            setHovered(index);
+          }}
+          onMouseOut={() => {
+            setHovered(null);
+          }}
+        />
+      )}
     </div>
   );
 }

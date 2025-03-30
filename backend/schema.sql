@@ -51,26 +51,6 @@ CREATE TABLE items (
 
 
 
--- Filters data for a specific user, month, and year.
--- Summarizes expenses per category.
--- Calculates each category’s percentage of the total budget.
-SELECT 
-    c.category_name,
-    SUM(i.planned_amount) AS category_total,
-    b.target_amount AS total_budget,
-    (SUM(i.planned_amount) / b.target_amount) * 100 AS percentage
-FROM budgets b
-LEFT JOIN items i ON b.date_id = i.date_id
-LEFT JOIN categories c ON i.category_id = c.id AND c.date_id = b.date_id
-LEFT JOIN dates d ON b.date_id = d.id
-WHERE b.date_id = (
-    SELECT id FROM dates WHERE user_id = ? AND year = ? AND month = ?
-) 
-GROUP BY c.category_name, b.target_amount;
-
-
-
-
 -- --------------------- reference
 -- what I inserted
 ALTER TABLE categories

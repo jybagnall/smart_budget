@@ -62,6 +62,53 @@ router.get(`/request-budget-month`, isLoggedIn, async (req, res) => {
   }
 });
 
+router.get(`/calculate-per-category`, isLoggedIn, async (req, res) => {
+  const userId = req.user.id;
+  const { dateId } = req.query;
+
+  try {
+    const q = `
+    SELECT
+      categories.category_name,
+      COALESCE(SUM(items.planned_amount), 0) AS total_per_category
+    FROM categories
+    LEFT JOIN items
+      ON categories.id = items.category_id
+      AND categories.date_id = items.date_id
+    WHERE categories.user_id = ? AND categories.date_id = ?
+    GROUP BY categories.id, categories.category_name
+    ;`;
+
+    const [result] = await pool.execute(q, [userId, dateId]);
+
+    return res.status(200).json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get(`/calculate-gross-spending`, isLoggedIn, async (req, res) => {
+  const userId = req.user.id;
+  const { dateId } = req.query;
+
+  try {
+    const q = `
+    SELECT
+      COALESCE(SUM(items.planned_amount), 0) AS total_spending
+    FROM items
+    JOIN dates
+      ON dates.id = items.date_id
+    WHERE dates.user_id = ? AND dates.id = ?
+    ;`;
+
+    const [result] = await pool.execute(q, [userId, dateId]);
+    const data = result[0];
+    return res.status(200).json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.post("/set-budgets", isLoggedIn, async (req, res) => {
   const { year, month, target_amount } = req.body;
   const userId = req.user.id;

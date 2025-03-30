@@ -1,7 +1,6 @@
 const tabLinks = [
   { tabName: "Status", href: "/expense-status" },
-  { tabName: "Planned", href: "/plan-expenses" },
-  { tabName: "Spent", href: "/spent-expenses" },
+  { tabName: "Spent", href: "/plan-expenses" },
   { tabName: "Settings", href: "/settings" },
 ];
 

@@ -60,8 +60,44 @@ export async function fetchAllDates() {
   }
 }
 
+export async function calculatePerCategory(dateId) {
+  try {
+    const res = await axios.get(
+      `/api/budgets/calculate-per-category?dateId=${dateId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error calculating total expenditure:", error);
+    return null;
+  }
+}
+
+export async function calculateGrossSpending(dateId) {
+  try {
+    const res = await axios.get(
+      `/api/budgets/calculate-gross-spending?dateId=${dateId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error calculating total expenditure:", error);
+    return null;
+  }
+}
+
 export function getMonthName(monthNum) {
   return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
     new Date(2000, monthNum - 1)
   );
+}
+
+export function formatMoney(number) {
+  return Math.floor(number)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

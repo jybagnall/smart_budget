@@ -9,7 +9,7 @@ export default function Tab({ to, children }) {
           isActive
             ? "border-sky-600 text-gray-900"
             : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-        }`
+        } text-xl font-semibold`
       }
     >
       {children}

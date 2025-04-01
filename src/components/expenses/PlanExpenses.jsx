@@ -8,10 +8,10 @@ export default function PlanExpenses() {
   const { categories, items, fetchItems, setItems } = useFetchedData(dateId);
 
   return (
-    <div className="bg-white min-h-screen flex justify-center pt-4 pb-1">
+    <div className="w-full max-w-3xl mx-auto pt-4 pb-6">
       <ul
         role="list"
-        className="grid w-full max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       >
         {categories.map((category) => (
           <CategoryCard

@@ -18,9 +18,9 @@ function App() {
     <Routes>
       <Route index element={<Homepage />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/set-budgets" element={<SetBudgetForm />} />
 
       <Route element={<RootLayout />}>
-        <Route path="/set-budgets" element={<SetBudgetForm />} />
         <Route path="/edit-budgets" element={<EditBudgetForm />} />
         <Route path="/set-more-budgets" element={<SetMoreBudgetForm />} />
 

@@ -5,6 +5,8 @@ import axios from "axios";
 
 import MonthSelector from "../MonthSelector";
 import SaveButton from "../buttons/SaveButton";
+import ModalError from "../alerts/ModalError";
+
 export default function SetBudgetForm() {
   const {
     register,
@@ -19,30 +21,44 @@ export default function SetBudgetForm() {
   const currentMonth = today.getMonth();
 
   const [targetMonth, setTargetMonth] = useState(currentMonth); // 0, 1..
+  const [targetYear, setTargetYear] = useState(currentYear);
+  const [showModal, setShowModal] = useState(false);
 
-  let adjustedYear = targetMonth < currentMonth ? currentYear + 1 : currentYear;
+  const handleChange = (direction) => {
+    setTargetMonth((month) => {
+      let newMonth = month;
 
-  if (adjustedYear === currentYear && targetMonth < currentMonth) {
-    alert("You cannot set a budget for past month.");
-    return;
-  }
-
-  // import this function
-  const getMonthName = (monthIndex) => {
-    return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-      new Date(adjustedYear, monthIndex)
-    );
+      if (direction === "prev") {
+        if (month === 0) {
+          newMonth = 11;
+          setTargetYear((year) => year - 1);
+        } else {
+          newMonth = month - 1;
+        }
+      } else if (direction === "next") {
+        if (month === 11) {
+          newMonth = 0;
+          setTargetYear((year) => year + 1);
+        } else {
+          newMonth = month + 1;
+        }
+      }
+      return newMonth;
+    });
   };
 
-  const handlePrevMonth = () =>
-    setTargetMonth((month) => (month === 0 ? 11 : month - 1));
-
-  const handleNextMonth = () =>
-    setTargetMonth((month) => (month === 11 ? 0 : month + 1));
-
   const onSubmit = async (data) => {
+    const isSubmittingPast =
+      (targetYear === currentYear && targetMonth < currentMonth) ||
+      targetYear < currentYear;
+
+    if (isSubmittingPast) {
+      setShowModal(true);
+      return;
+    }
+
     const payload = {
-      year: adjustedYear,
+      year: targetYear,
       month: targetMonth + 1,
       target_amount: data.targetSpending,
     };
@@ -67,9 +83,8 @@ export default function SetBudgetForm() {
         className="w-full max-w-md space-y-6 bg-white p-6 rounded-lg shadow-md"
       >
         <MonthSelector
-          handleNextMonth={handleNextMonth}
-          handlePrevMonth={handlePrevMonth}
-          getMonthName={getMonthName}
+          handleChange={handleChange}
+          targetYear={targetYear}
           targetMonth={targetMonth}
         />
 
@@ -108,6 +123,14 @@ export default function SetBudgetForm() {
 
         <SaveButton bgColor={"bg-sky-200"} />
       </form>
+
+      {showModal && (
+        <ModalError
+          title="Invalid Date"
+          description="A budget for a past month or year cannot be set."
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

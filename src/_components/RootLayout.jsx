@@ -53,7 +53,7 @@ export default function RootLayout() {
             />
           </div>
         </div>
-        <main className="w-full pt-4 pb-8">
+        <main className="w-full pt-20 pb-8 sm:pt-24">
           <div className="max-w-3xl mx-auto">
             <Outlet />
           </div>

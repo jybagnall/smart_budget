@@ -18,7 +18,7 @@ export default function SelectedDate({
 
   return (
     <header>
-      <div className="max-w-3xl mx-auto">
+      <div className="w-full px-4 sm:px-6 lg:px-0 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto">
         <div className="flex justify-start relative">
           <div
             onClick={handleShowOptions}
@@ -38,12 +38,14 @@ export default function SelectedDate({
               />
             )}
 
-            {showOptions && (
-              <AllDatesDropDown
-                allDates={allDates}
-                handleSelectedDateId={handleSelectedDateId}
-              />
-            )}
+            <div className="relative z-10">
+              {showOptions && (
+                <AllDatesDropDown
+                  allDates={allDates}
+                  handleSelectedDateId={handleSelectedDateId}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

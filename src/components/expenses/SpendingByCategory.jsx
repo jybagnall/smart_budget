@@ -1,5 +1,6 @@
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { getRandomColor } from "../../helperFunctions";
+import { formatMoney } from "../../helperFunctions";
 
 export default function SpendingByCategory({ sumPerCategory }) {
   return (
@@ -32,7 +33,7 @@ export default function SpendingByCategory({ sumPerCategory }) {
                     {category.category_name}
                   </p>
                   <p className="text-sm text-gray-500 whitespace-nowrap">
-                    {category.total_per_category}
+                    ${formatMoney(category.total_per_category)}
                   </p>
                 </div>
               </div>

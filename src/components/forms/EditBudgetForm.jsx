@@ -69,10 +69,10 @@ export default function EditBudgetForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="w-full">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md space-y-8 bg-white p-6 rounded-lg shadow-md"
+        className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto space-y-8 bg-white p-6 rounded-lg shadow-md transition-all duration-300 ease-in-out"
       >
         <label
           htmlFor="target_amount"

@@ -26,9 +26,9 @@ export default function AddCategoryForm({ handleAdd }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex justify-center mt-6  items-center space-x-3 bg-white px-4"
+      className="w-full mt-6 bg-white px-4"
     >
-      <div className="w-full max-w-md space-y-6 bg-gray-50 p-2 rounded-lg shadow-md">
+      <div className="w-full max-w-lg space-y-6 bg-gray-50 p-2 rounded-lg shadow-md">
         <div className="flex items-center space-x-3">
           <input
             {...register("category_name", {

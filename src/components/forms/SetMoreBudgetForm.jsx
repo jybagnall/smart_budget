@@ -5,10 +5,11 @@ import axios from "axios";
 
 import MonthSelector from "../MonthSelector";
 import SaveButton from "../buttons/SaveButton";
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import ModalError from "../alerts/ModalError";
 import useTargetMonthPicker from "../../customHooks/useTargetMonthPicker";
 
-export default function SetBudgetForm() {
+export default function SetMoreBudgetForm() {
   const {
     register,
     handleSubmit,
@@ -16,7 +17,7 @@ export default function SetBudgetForm() {
   } = useForm();
 
   const navigate = useNavigate();
-
+  const { refreshTargetMonth } = useTargetMonth();
   const { targetMonth, targetYear, handleChange, isSubmittingPast } =
     useTargetMonthPicker();
 
@@ -50,14 +51,24 @@ export default function SetBudgetForm() {
     };
 
     try {
-      const res = await axios.post("/api/budgets/set-budgets", payload, {
+      const res = await axios.post("/api/budgets/set-more-budgets", payload, {
         withCredentials: true,
       });
 
       if (res.status === 201 && res.data.message.includes("successfully")) {
+        await refreshTargetMonth();
         navigate("/category-list");
       }
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        const errorMsg = e.response?.data?.message;
+
+        if (e.response?.status === 409) {
+          showModal("Budget Conflict", errorMsg || "A conflict occured.");
+        } else {
+          showModal("Server Error", "Something Went Wrong");
+        }
+      }
       console.error(e);
     }
   };
@@ -73,13 +84,6 @@ export default function SetBudgetForm() {
           targetYear={targetYear}
           targetMonth={targetMonth}
         />
-
-        <label
-          htmlFor="targetSpending"
-          className="block text-lg font-semibold text-gray-900"
-        >
-          What is your spending target?
-        </label>
 
         <div className="relative mt-4">
           <div className="flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 focus-within:border-indigo-500">

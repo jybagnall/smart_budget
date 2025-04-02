@@ -12,9 +12,10 @@ export default function CategoryList() {
   const { dateId, isLoading } = useTargetMonth();
 
   const fetchCategories = useCallback(async () => {
-    if (!dateId) return; // prevent unnecessary api calls
+    if (!dateId) return;
 
     try {
+      console.log(dateId);
       const res = await axios.get(`/api/categories?dateId=${dateId}`, {
         withCredentials: true,
       });
@@ -57,6 +58,7 @@ export default function CategoryList() {
 
     try {
       await axios.delete(`/api/categories/${categoryId}`, {
+        data: { dateId },
         withCredentials: true,
       });
     } catch (e) {
@@ -67,31 +69,33 @@ export default function CategoryList() {
   };
 
   return (
-    <div className="bg-neutral-50 min-h-screen flex justify-center py-30">
-      <div className="w-full max-w-md bg-white p-4 rounded-lg shadow-md">
-        <label
-          htmlFor="category"
-          className="block text-lg font-semibold text-gray-900 ml-4"
-        >
-          Add your expense categories
-        </label>
+    <div className="bg-white h-fit flex justify-center py-5">
+      <div className="w-full max-w-3xl mx-auto bg-white rounded-lg shadow-md">
+        <div className="p-4 sm:p-6 md:p-8">
+          <label
+            htmlFor="category"
+            className="block text-lg font-semibold text-gray-900 ml-4"
+          >
+            Add your expense categories
+          </label>
 
-        <AddCategoryForm handleAdd={handleAdd} />
+          <AddCategoryForm handleAdd={handleAdd} />
 
-        {/* boder */}
-        <div className="flex items-center justify-between space-x-3 mt-4 border-t border-gray-200 px-2 py-2 sm:px-3"></div>
+          {/* boder */}
+          <hr className="w-full mt-7 mb-7 border-t border-gray-200 px-4 sm:px-6 lg:px-8" />
 
-        {categories.map((category) => (
-          <CategoryItem
-            key={category.id}
-            {...category}
-            handleDelete={handleDelete}
-          />
-        ))}
-        <div className="mt-10">
-          <NavigationButton to={"/plan-expenses"}>
-            Navigate to add items
-          </NavigationButton>
+          {categories.map((category) => (
+            <CategoryItem
+              key={category.id}
+              {...category}
+              handleDelete={handleDelete}
+            />
+          ))}
+          <div className="mt-10">
+            <NavigationButton to={"/plan-expenses"}>
+              Navigate to add items
+            </NavigationButton>
+          </div>
         </div>
       </div>
     </div>

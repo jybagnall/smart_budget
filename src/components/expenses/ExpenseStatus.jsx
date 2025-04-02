@@ -1,72 +1,73 @@
-import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { PieChart } from "react-minimal-pie-chart";
+
+import { useTargetMonth } from "../../contexts/TargetMonthContext";
+import Loading from "../alerts/Loading";
+import {
+  calculatePerCategory,
+  calculateGrossSpending,
+  fetchTargetSpending,
+} from "../../../backend/helpers/api";
+import Chart from "./Chart";
+import TotalExpenditure from "./TotalExpenditure";
+import SpendingByCategory from "./SpendingByCategory";
 
 export default function ExpenseStatus() {
-  const [categories, setCategories] = useState([]);
-  const [totalBudget, setTotalBudget] = useState(0);
+  const { dateId, isLoading } = useTargetMonth();
+  const [sumPerCategory, setSumPerCategory] = useState([]);
+  const [totalSpending, setTotalSpending] = useState(null);
+  const [targetBudget, setTargetBudget] = useState(null);
 
-  const fetchCategories = async () => {
-    try {
-      const res = await axios.get("/api/items/expense-status", {
-        withCredentials: true,
-      });
+  async function loadData() {
+    const fetchedPerCategory = await calculatePerCategory(dateId);
+    const fetchedGrossSpending = await calculateGrossSpending(dateId);
+    const fetchedBudget = await fetchTargetSpending(dateId);
 
-      const current_planned_budget_total = res.data.reduce(
-        (sum, category) => sum + parseFloat(category.sum_per_category || 0),
-        0
-      );
-      setTotalBudget(current_planned_budget_total);
-      setCategories(res.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+    if (fetchedPerCategory) {
+      setSumPerCategory(fetchedPerCategory);
     }
-  };
+    setTotalSpending(fetchedGrossSpending.total_spending);
+    setTargetBudget(fetchedBudget.target_amount);
+  }
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (!dateId) return;
 
-  const colors = ["#E38627", "#C13C37", "#96a6df", "#00A36C", "#FF5733"];
+    loadData();
+  }, [dateId]);
 
-  const chartData = categories.map((category, index) => ({
-    title: category.category_name,
-    value: parseFloat(category.sum_per_category || 0),
-    percentage: totalBudget
-      ? (parseFloat(category.sum_per_category || 0) / totalBudget) * 100
-      : 0,
-    color: colors[index % colors.length],
-  }));
+  useEffect(() => {
+    if (sumPerCategory.length > 0) {
+      console.log("sumPerCategory:", sumPerCategory);
+    }
+  }, [sumPerCategory]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
-    <div>
-      <PieChart
-        data={chartData}
-        lineWidth={70} // Adjusts thickness of the chart
-        radius={15} // Adjusts the pie chart size within the container
-        label={({ dataEntry }) => `${Math.round(dataEntry.percentage)}%`} // Show percentage labels
-        labelStyle={{
-          fontSize: "8px",
-          fontFamily: "sans-serif",
-          fill: "#fff",
-        }}
-        labelPosition={70} // Ensures labels are inside
-        animate={true} // Enables animation
-        animationDuration={1000} // 1-second animation
-        animationEasing="ease-out"
-        startAngle={-90} // Starts from top
-        lengthAngle={360} // Full-circle chart
-        paddingAngle={3} // Adds spacing between segments
-        rounded // Rounds segment edges
-        segmentsShift={(index) => (index === 1 ? 3 : 1)} // Slight shift for effect
-      />
-      <NavLink
-        to="/category-list"
-        className="rounded-md bg-emerald-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-emerald-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-      >
-        Add a new category
-      </NavLink>
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow-md p-6 flex justify-center items-center">
+          <div className="w-60 h-60">
+            <Chart sumPerCategory={sumPerCategory} />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <TotalExpenditure
+            totalSpending={totalSpending}
+            targetBudget={targetBudget}
+          />
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Spending by Category
+            </h2>
+            <SpendingByCategory sumPerCategory={sumPerCategory} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

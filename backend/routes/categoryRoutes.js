@@ -74,13 +74,14 @@ router.post("", isLoggedIn, async (req, res) => {
 router.delete("/:categoryId", isLoggedIn, async (req, res) => {
   const user_id = req.user.id;
   const { categoryId } = req.params;
+  const { dateId } = req.body;
 
   try {
     const delete_q = `
     DELETE FROM categories 
-    WHERE id=? AND user_id=?`;
+    WHERE id=? AND user_id=? AND date_id=?`;
 
-    const [result] = await pool.execute(delete_q, [categoryId, user_id]);
+    const [result] = await pool.execute(delete_q, [categoryId, user_id, dateId]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Requested category not found" });

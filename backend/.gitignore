@@ -9,7 +9,7 @@ build/
 
 # Docker files
 docker-compose.override.yml
-docker-compose.yml
+
 docker-data/
 
 # Logs

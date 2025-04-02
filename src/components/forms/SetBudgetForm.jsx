@@ -6,6 +6,7 @@ import axios from "axios";
 import MonthSelector from "../MonthSelector";
 import SaveButton from "../buttons/SaveButton";
 import ModalError from "../alerts/ModalError";
+import useTargetMonthPicker from "../../customHooks/useTargetMonthPicker";
 
 export default function SetBudgetForm() {
   const {
@@ -16,44 +17,29 @@ export default function SetBudgetForm() {
 
   const navigate = useNavigate();
 
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
+  const { targetMonth, targetYear, handleChange, isSubmittingPast } =
+    useTargetMonthPicker();
 
-  const [targetMonth, setTargetMonth] = useState(currentMonth); // 0, 1..
-  const [targetYear, setTargetYear] = useState(currentYear);
-  const [showModal, setShowModal] = useState(false);
+  const [modalState, setModalState] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
 
-  const handleChange = (direction) => {
-    setTargetMonth((month) => {
-      let newMonth = month;
-
-      if (direction === "prev") {
-        if (month === 0) {
-          newMonth = 11;
-          setTargetYear((year) => year - 1);
-        } else {
-          newMonth = month - 1;
-        }
-      } else if (direction === "next") {
-        if (month === 11) {
-          newMonth = 0;
-          setTargetYear((year) => year + 1);
-        } else {
-          newMonth = month + 1;
-        }
-      }
-      return newMonth;
+  const showModal = (title, message) => {
+    setModalState({
+      visible: true,
+      title,
+      message,
     });
   };
 
   const onSubmit = async (data) => {
-    const isSubmittingPast =
-      (targetYear === currentYear && targetMonth < currentMonth) ||
-      targetYear < currentYear;
-
     if (isSubmittingPast) {
-      setShowModal(true);
+      showModal(
+        "Invalid Date",
+        "A budget for a past month or year cannot be set."
+      );
       return;
     }
 
@@ -124,11 +110,13 @@ export default function SetBudgetForm() {
         <SaveButton bgColor={"bg-sky-200"} />
       </form>
 
-      {showModal && (
+      {modalState.visible && (
         <ModalError
-          title="Invalid Date"
-          description="A budget for a past month or year cannot be set."
-          onClose={() => setShowModal(false)}
+          title={modalState.title}
+          description={modalState.message}
+          onClose={() =>
+            setModalState({ visible: false, title: "", message: "" })
+          }
         />
       )}
     </div>

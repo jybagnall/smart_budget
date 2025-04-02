@@ -1,4 +1,4 @@
-import { formatMoney } from "../../../backend/helpers/api";
+import { formatMoney } from "../../helperFunctions";
 
 export default function TotalExpenditure({ totalSpending, targetBudget }) {
   const formatSpending = formatMoney(totalSpending);

@@ -1,4 +1,4 @@
-import { useFetchedData } from "../../../backend/helpers/useFetchedData";
+import { useFetchedData } from "../../customHooks/useFetchedData";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import CategoryCard from "./CategoryCard";
 
@@ -11,16 +11,21 @@ export default function PlanExpenses() {
     <div className="w-full max-w-3xl mx-auto pt-4 pb-6">
       <ul
         role="list"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="grid grid-cols-1 lg:grid-cols-2 gap-4 auto-rows-fr"
       >
         {categories.map((category) => (
-          <CategoryCard
+          <li
             key={category.id}
-            category={category}
-            items={items}
-            fetchItems={fetchItems}
-            setItems={setItems}
-          />
+            className="w-full flex-grow min-w-[380px] max-w-[480px] mx-auto"
+          >
+            <CategoryCard
+              key={category.id}
+              category={category}
+              items={items}
+              fetchItems={fetchItems}
+              setItems={setItems}
+            />
+          </li>
         ))}
       </ul>
     </div>

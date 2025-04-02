@@ -1,20 +1,25 @@
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
-import { getMonthName } from "../../backend/helpers/api";
+import { getMonthName } from "../helperFunctions";
 import Loading from "../components/alerts/Loading";
 import AllDatesDropDown from "./AllDatesDropDown";
+import { useState } from "react";
 
 export default function SelectedDate({
-  handleShowOptions,
   targetMonth,
   targetYear,
-  showOptions,
   allDates,
   handleSelectedDateId,
 }) {
+  const [showOptions, setShowOptions] = useState(false);
+
+  const handleShowOptions = () => {
+    setShowOptions((show) => !show);
+  };
+
   return (
     <header>
       <div className="max-w-3xl mx-auto">
-        <div className="flex justify-start">
+        <div className="flex justify-start relative">
           <div
             onClick={handleShowOptions}
             className="flex items-center space-x-2 cursor-pointer"
@@ -26,10 +31,13 @@ export default function SelectedDate({
                 <Loading />
               )}
             </h1>
-            <ChevronDownIcon
-              aria-hidden="true"
-              className="size-5 text-gray-500 hover:text-gray-700 cursor-pointer sm:size-4"
-            />
+            {allDates.length > 1 && (
+              <ChevronDownIcon
+                aria-hidden="true"
+                className="size-5 text-gray-500 hover:text-gray-700 cursor-pointer sm:size-4"
+              />
+            )}
+
             {showOptions && (
               <AllDatesDropDown
                 allDates={allDates}

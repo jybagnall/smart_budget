@@ -17,7 +17,7 @@ export default function CategoryCard({
   );
 
   return (
-    <li
+    <div
       key={category.id}
       className="w-full max-w-md h-[250px] mx-auto rounded-xl border border-gray-200 bg-white shadow-md flex flex-col"
     >
@@ -62,6 +62,6 @@ export default function CategoryCard({
           <AddItemButton onClick={() => setIsAdding(true)} />
         </div>
       )}
-    </li>
+    </div>
   );
 }

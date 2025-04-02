@@ -6,6 +6,8 @@ import axios from "axios";
 import MonthSelector from "../MonthSelector";
 import SaveButton from "../buttons/SaveButton";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
+import ModalError from "../alerts/ModalError";
+import useTargetMonthPicker from "../../customHooks/useTargetMonthPicker";
 
 export default function SetMoreBudgetForm() {
   const {
@@ -16,41 +18,40 @@ export default function SetMoreBudgetForm() {
 
   const navigate = useNavigate();
   const { refreshTargetMonth } = useTargetMonth();
+  const { targetMonth, targetYear, handleChange, isSubmittingPast } =
+    useTargetMonthPicker();
 
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth();
+  const [modalState, setModalState] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
 
-  const [targetMonth, setTargetMonth] = useState(currentMonth); // 0, 1..
-
-  let adjustedYear = targetMonth < currentMonth ? currentYear + 1 : currentYear;
-
-  if (adjustedYear === currentYear && targetMonth < currentMonth) {
-    alert("You cannot set a budget for past month.");
-    return;
-  }
-
-  const getMonthName = (monthIndex) => {
-    return new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-      new Date(adjustedYear, monthIndex)
-    );
+  const showModal = (title, message) => {
+    setModalState({
+      visible: true,
+      title,
+      message,
+    });
   };
 
-  const handlePrevMonth = () =>
-    setTargetMonth((month) => (month === 0 ? 11 : month - 1));
-
-  const handleNextMonth = () =>
-    setTargetMonth((month) => (month === 11 ? 0 : month + 1));
-
   const onSubmit = async (data) => {
+    if (isSubmittingPast) {
+      showModal(
+        "Invalid Date",
+        "A budget for a past month or year cannot be set."
+      );
+      return;
+    }
+
     const payload = {
-      year: adjustedYear,
+      year: targetYear,
       month: targetMonth + 1,
       target_amount: data.targetSpending,
     };
 
     try {
-      const res = await axios.post("/api/budgets/set-budgets", payload, {
+      const res = await axios.post("/api/budgets/set-more-budgets", payload, {
         withCredentials: true,
       });
 
@@ -59,6 +60,15 @@ export default function SetMoreBudgetForm() {
         navigate("/category-list");
       }
     } catch (e) {
+      if (axios.isAxiosError(e)) {
+        const errorMsg = e.response?.data?.message;
+
+        if (e.response?.status === 409) {
+          showModal("Budget Conflict", errorMsg || "A conflict occured.");
+        } else {
+          showModal("Server Error", "Something Went Wrong");
+        }
+      }
       console.error(e);
     }
   };
@@ -70,9 +80,8 @@ export default function SetMoreBudgetForm() {
         className="w-full max-w-md space-y-6 bg-white p-6 rounded-lg shadow-md"
       >
         <MonthSelector
-          handleNextMonth={handleNextMonth}
-          handlePrevMonth={handlePrevMonth}
-          getMonthName={getMonthName}
+          handleChange={handleChange}
+          targetYear={targetYear}
           targetMonth={targetMonth}
         />
 
@@ -92,18 +101,28 @@ export default function SetMoreBudgetForm() {
               aria-describedby="price-currency"
             />
             <span id="price-currency" className="text-gray-500">
-              USD 
+              USD
             </span>
-          </div> 
+          </div>
           {errors.targetSpending?.message && (
             <span className="mt-2 text-xs text-red-600">
               {errors.targetSpending.message}
             </span>
           )}
-        </div> 
- 
+        </div>
+
         <SaveButton bgColor={"bg-sky-200"} />
       </form>
+
+      {modalState.visible && (
+        <ModalError
+          title={modalState.title}
+          description={modalState.message}
+          onClose={() =>
+            setModalState({ visible: false, title: "", message: "" })
+          }
+        />
+      )}
     </div>
   );
 }

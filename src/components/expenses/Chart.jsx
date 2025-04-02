@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PieChart } from "react-minimal-pie-chart";
-import { getHexColor } from "../../../backend/helpers/api";
+import { getHexColor } from "../../helperFunctions";
 
 const lineWidth = 60;
 

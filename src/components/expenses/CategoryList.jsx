@@ -15,6 +15,7 @@ export default function CategoryList() {
     if (!dateId) return;
 
     try {
+      console.log(dateId);
       const res = await axios.get(`/api/categories?dateId=${dateId}`, {
         withCredentials: true,
       });

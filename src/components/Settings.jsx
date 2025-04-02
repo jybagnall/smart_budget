@@ -7,8 +7,8 @@ import Loading from "./alerts/Loading";
 import {
   fetchTargetSpending,
   fetchCategories,
-  formatMoney,
 } from "../../backend/helpers/api";
+import { formatMoney } from "../helperFunctions";
 
 export default function Settings() {
   const { dateId, isLoading } = useTargetMonth();

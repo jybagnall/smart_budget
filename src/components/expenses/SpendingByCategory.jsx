@@ -1,5 +1,5 @@
 import { CheckIcon } from "@heroicons/react/24/outline";
-import { getRandomColor } from "../../../backend/helpers/api";
+import { getRandomColor } from "../../helperFunctions";
 
 export default function SpendingByCategory({ sumPerCategory }) {
   return (

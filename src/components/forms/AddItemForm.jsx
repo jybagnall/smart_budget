@@ -94,16 +94,16 @@ export default function AddItemForm({
 
   return (
     <div className="py-1">
-      <form className="flex justify-between items-center w-full gap-x-4 px-1 py-1">
-        {/* Item Name Field Wrapper */}
+      <form className="flex items-center w-full gap-x-4 px-1 py-1">
+        {/* Item Name Field */}
         <div
-          className={`w-full px-2 py-1 rounded-md
-          ${
-            errors.item_name
-              ? "border border-red-500"
-              : "border border-gray-300"
-          } 
-          bg-white`}
+          className={`flex-1 px-2 py-1 rounded-md 
+            ${
+              errors.item_name
+                ? "border border-red-500"
+                : "border border-gray-300"
+            } 
+            bg-white`}
         >
           <input
             {...register("item_name", {
@@ -113,7 +113,7 @@ export default function AddItemForm({
             name="item_name"
             id="item_name"
             className="w-full text-base text-gray-900 placeholder:text-gray-400 
-            bg-transparent border-none outline-none focus:ring-0 focus:bg-white"
+            bg-transparent border-none outline-none focus:ring-0"
             placeholder="Type an expense item"
             value={item_name}
             ref={itemRef}
@@ -131,13 +131,13 @@ export default function AddItemForm({
 
         {/* Planned Amount Field Wrapper */}
         <div
-          className={`relative w-32 left-3 flex items-center px-2 py-1 rounded-md
-          ${
-            errors.planned_amount
-              ? "border border-red-500"
-              : "border border-gray-300"
-          }
-          bg-white`}
+          className={`w-28 flex items-center px-2 py-1 rounded-md 
+            ${
+              errors.planned_amount
+                ? "border border-red-500"
+                : "border border-gray-300"
+            } 
+            bg-white`}
         >
           <span className="text-gray-500 select-none pointer-events-none">
             $
@@ -151,7 +151,7 @@ export default function AddItemForm({
             type="number"
             name="planned_amount"
             id="planned_amount"
-            className="w-full pl-2 text-right bg-transparent text-lg text-gray-900 placeholder-gray-400 border-none outline-none focus:ring-0"
+            className="w-full pl-2 text-right bg-transparent text-base text-gray-900 placeholder-gray-400 border-none outline-none focus:ring-0"
             placeholder="0.00"
             style={{
               appearance: "none",

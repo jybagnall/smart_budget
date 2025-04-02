@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import axios from "axios";
-//import { useNavigate } from "react-router-dom";
 
+import { getMonthName, formatMoney } from "../../helperFunctions";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import Loading from "../alerts/Loading";
 import SaveButton from "../buttons/SaveButton";
@@ -34,7 +34,7 @@ export default function EditBudgetForm() {
       );
       setMonth(res.data.month);
       setYear(res.data.year);
-      setBudget(res.data.target_amount);
+      setBudget(Number(res.data.target_amount));
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -48,15 +48,6 @@ export default function EditBudgetForm() {
   if (isLoading) {
     return <Loading />;
   }
-
-  const getMonthName = (monthNum) =>
-    new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-      new Date(2000, monthNum - 1)
-    );
-
-  const formatAmount = (amount) => {
-    return amount?.toLocaleString("en-US");
-  };
 
   const onSubmit = async (data) => {
     const payload = {
@@ -89,7 +80,7 @@ export default function EditBudgetForm() {
         >
           Edit{" "}
           <span className="text-sky-600">
-            {getMonthName(month)}, {year}
+            {getMonthName(month - 1)}, {year}
           </span>{" "}
           spending target
         </label>

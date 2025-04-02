@@ -12,8 +12,6 @@ export default function RootLayout() {
 
   const [allDates, setAllDates] = useState([]);
 
-  const [showOptions, setShowOptions] = useState(false);
-
   const loadAllDates = useCallback(async () => {
     const fetchedAllDates = await fetchAllDates();
     setAllDates(fetchedAllDates);
@@ -29,10 +27,6 @@ export default function RootLayout() {
     return <Loading />;
   }
 
-  const handleShowOptions = () => {
-    setShowOptions((show) => !show);
-  };
-
   const handleSelectedDateId = (newDateId) => {
     const selected = allDates.find((date) => date.id === newDateId);
 
@@ -43,7 +37,6 @@ export default function RootLayout() {
         month: selected.month,
       });
     }
-    setShowOptions(false);
   };
 
   return (
@@ -55,9 +48,8 @@ export default function RootLayout() {
             <SelectedDate
               targetMonth={targetMonth}
               targetYear={targetYear}
-              showOptions={showOptions}
-              handleShowOptions={handleShowOptions}
               handleSelectedDateId={handleSelectedDateId}
+              allDates={allDates}
             />
           </div>
         </div>

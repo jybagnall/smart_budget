@@ -1,6 +1,12 @@
 import { getMonthName } from "../helperFunctions";
 
-export default function AllDatesDropDown({ allDates, handleSelectedDateId }) {
+export default function AllDatesDropDown({ allDates, setShowOptions, handleSelectedDateId }) {
+
+  const selectDate = (date) => {
+    setShowOptions(false);
+    handleSelectedDateId(date.id);
+  }
+
   if (allDates.length <= 1) return null;
   return (
     <div
@@ -11,7 +17,7 @@ export default function AllDatesDropDown({ allDates, handleSelectedDateId }) {
         {allDates.map((date) => (
           <div
             key={date.id}
-            onClick={() => handleSelectedDateId(date.id)}
+            onClick={() => selectDate(date)}
             className="block w-full pl-4 pr-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
           >
             {getMonthName(date.month - 1)}, {date.year}

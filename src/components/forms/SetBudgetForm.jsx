@@ -35,7 +35,7 @@ export default function SetBudgetForm() {
   };
 
   const onSubmit = async (data) => {
-    if (isSubmittingPast) {
+    if (isSubmittingPast()) {
       showModal(
         "Invalid Date",
         "A budget for a past month or year cannot be set."

@@ -26,7 +26,7 @@ export default function SelectedDate({
           >
             <h1 className="text-2xl font-bold tracking-tight text-sky-700 flex items-center transition-all duration-200 hover:text-sky-600 hover:underline">
               {targetMonth ? (
-                `${getMonthName(targetMonth)}, ${targetYear}`
+                `${getMonthName(targetMonth - 1)}, ${targetYear}`
               ) : (
                 <Loading />
               )}
@@ -42,6 +42,7 @@ export default function SelectedDate({
               {showOptions && (
                 <AllDatesDropDown
                   allDates={allDates}
+                setShowOptions={setShowOptions}
                   handleSelectedDateId={handleSelectedDateId}
                 />
               )}

@@ -4,6 +4,7 @@ services:
     command: npm run dev
     ports:
       - "5000:5000"
+      - "9229:9229"
     depends_on:
       - mysql
     env_file:

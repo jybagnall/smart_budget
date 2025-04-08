@@ -11,27 +11,31 @@ import PlanExpenses from "./expenses/PlanExpenses";
 import Settings from "../components/Settings";
 import SetMoreBudgetForm from "./forms/SetMoreBudgetForm";
 import RootLayout from "../_components/RootLayout";
-import Navbar from "../_components/Navbar";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
-    <Routes>
-      <Route index element={<Homepage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/set-budgets" element={<SetBudgetForm />} />
+    <>
+      <Toaster position="top-right" reverseOrder={false} />
 
-      <Route element={<RootLayout />}>
-        <Route path="/edit-budgets" element={<EditBudgetForm />} />
-        <Route path="/set-more-budgets" element={<SetMoreBudgetForm />} />
+      <Routes>
+        <Route index element={<Homepage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/set-budgets" element={<SetBudgetForm />} />
 
-        <Route path="/expense-status" element={<ExpenseStatus />} />
-        <Route path="/category-list" element={<CategoryList />} />
-        <Route path="/plan-expenses" element={<PlanExpenses />} />
-        <Route path="/settings" element={<Settings />} />
-      </Route>
+        <Route element={<RootLayout />}>
+          <Route path="/edit-budgets" element={<EditBudgetForm />} />
+          <Route path="/set-more-budgets" element={<SetMoreBudgetForm />} />
 
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+          <Route path="/expense-status" element={<ExpenseStatus />} />
+          <Route path="/category-list" element={<CategoryList />} />
+          <Route path="/plan-expenses" element={<PlanExpenses />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </>
   );
 }
 

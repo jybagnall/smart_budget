@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
+import SaveSVGButton from "../buttons/SaveSVGButton";
 
 export default function AddItemForm({
   selectedCategoryID,
@@ -9,11 +10,11 @@ export default function AddItemForm({
   setItems,
   setEditID,
   onCloseForm,
+  setHasFormErrorMsg,
 }) {
   const {
     register,
-    trigger,
-    setValue,
+    handleSubmit,
     formState: { errors },
   } = useForm();
 
@@ -25,86 +26,72 @@ export default function AddItemForm({
 
   const { dateId } = useTargetMonth();
 
-  const itemRef = useRef(null);
-  const amountRef = useRef(null);
-  const submitTimeoutRef = useRef(null);
-
   useEffect(() => {
-    return () => {
-      if (submitTimeoutRef.current) {
-        clearTimeout(submitTimeoutRef.current);
-      }
-    };
-  }, []);
+    if (setHasFormErrorMsg) {
+      setHasFormErrorMsg(Object.keys(errors).length > 0);
+    }
+  }, [errors, setHasFormErrorMsg]);
 
-  const handleBlur = () => {
-    if (submitTimeoutRef.current) {
-      clearTimeout(submitTimeoutRef.current);
+  const onSubmit = async (data) => {
+    const { item_name, planned_amount } = data;
+    if (
+      !item_name.trim() ||
+      !planned_amount.trim() ||
+      !selectedCategoryID ||
+      !dateId
+    ) {
+      setEditID(null);
+      onCloseForm();
+      return;
     }
 
-    submitTimeoutRef.current = setTimeout(async () => {
-      if (!item_name || !planned_amount || !selectedCategoryID || !dateId)
-        return;
+    if (
+      item_name === lastSubmittedName &&
+      planned_amount === lastSubmittedAmount
+    )
+      return;
 
-      if (
-        item_name === lastSubmittedName &&
-        planned_amount === lastSubmittedAmount
-      )
-        return;
-
-      try {
-        const res = await axios.post(
-          `/api/items/${selectedCategoryID}`,
-          { item_name, planned_amount, dateId },
-          {
-            withCredentials: true,
-          }
-        );
-
-        if (res.status === 201) {
-          setItems((items) => [
-            ...items,
-            {
-              id: res.data.id,
-              category_id: selectedCategoryID,
-              item_name,
-              planned_amount,
-              date_id: dateId,
-            },
-          ]);
-          setItem_name("");
-          setPlanned_amount("");
-          setLastSubmittedName(item_name);
-          setLastSubmittedAmount(planned_amount);
-          setEditID(null);
-          onCloseForm();
-          fetchItems();
+    try {
+      const res = await axios.post(
+        `/api/items/${selectedCategoryID}`,
+        { item_name, planned_amount, dateId },
+        {
+          withCredentials: true,
         }
-      } catch (e) {
-        console.error(e);
-      }
+      );
 
-      if (item_name.length >= 2 && !planned_amount) {
-        amountRef.current?.focus();
-      } else if (planned_amount.length >= 2 && !item_name) {
-        itemRef.current?.focus();
+      if (res.status === 201) {
+        setItems((items) => [
+          ...items,
+          {
+            id: res.data.id,
+            category_id: selectedCategoryID,
+            item_name,
+            planned_amount,
+            date_id: dateId,
+          },
+        ]);
+        setItem_name("");
+        setPlanned_amount("");
+        setLastSubmittedName(item_name);
+        setLastSubmittedAmount(planned_amount);
+        setEditID(null);
+        onCloseForm();
+        fetchItems();
       }
-    }, 500);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
     <div className="py-1">
-      <form className="flex items-center w-full gap-x-4 px-1 py-1">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-wrap md:flex-nowrap items-center w-full gap-3 px-2 py-0"
+      >
         {/* Item Name Field */}
-        <div
-          className={`flex-1 px-2 py-1 rounded-md 
-            ${
-              errors.item_name
-                ? "border border-red-500"
-                : "border border-gray-300"
-            } 
-            bg-white`}
-        >
+        <div className="flex-1 min-w-[120px] px-2">
           <input
             {...register("item_name", {
               required: "*Please enter the category name",
@@ -116,32 +103,16 @@ export default function AddItemForm({
             bg-transparent border-none outline-none focus:ring-0"
             placeholder="Type an expense item"
             value={item_name}
-            ref={itemRef}
             onChange={(e) => {
               setItem_name(e.target.value);
-              setValue("item_name", e.target.value, { shouldValidate: true });
-            }}
-            onBlur={async () => {
-              await trigger(["item_name", "planned_amount"]);
-              handleBlur();
             }}
             autoFocus
           />
         </div>
 
         {/* Planned Amount Field Wrapper */}
-        <div
-          className={`w-28 flex items-center px-2 py-1 rounded-md 
-            ${
-              errors.planned_amount
-                ? "border border-red-500"
-                : "border border-gray-300"
-            } 
-            bg-white`}
-        >
-          <span className="text-gray-500 select-none pointer-events-none">
-            $
-          </span>
+        <div className={"w-28 flex px-1 items-baseline gap-0.5"}>
+          <span className="text-gray-500">$</span>
           <input
             {...register("planned_amount", {
               required: "*Please enter the target spending",
@@ -151,29 +122,26 @@ export default function AddItemForm({
             type="number"
             name="planned_amount"
             id="planned_amount"
-            className="w-full pl-2 text-right bg-transparent text-base text-gray-900 placeholder-gray-400 border-none outline-none focus:ring-0"
+            className="bg-transparent text-base text-right text-gray-900 placeholder-gray-400 border-none outline-none focus:ring-0 w-full"
             placeholder="0.00"
-            style={{
-              appearance: "none",
-              MozAppearance: "textfield",
-              WebkitAppearance: "none",
-            }}
             aria-describedby="price-currency"
             value={planned_amount}
-            ref={amountRef}
             onChange={(e) => {
               setPlanned_amount(e.target.value.slice(0, 6));
-              setValue("planned_amount", e.target.value, {
-                shouldValidate: true,
-              });
-            }}
-            onBlur={async () => {
-              await trigger(["item_name", "planned_amount"]);
-              handleBlur();
             }}
           />
         </div>
+        <SaveSVGButton />
       </form>
+      {errors.item_name && (
+        <span className="text-red-500 text-sm">{errors.item_name.message}</span>
+      )}{" "}
+      <br />
+      {errors.planned_amount && (
+        <span className="text-red-500 text-sm">
+          {errors.planned_amount.message}
+        </span>
+      )}
     </div>
   );
 }

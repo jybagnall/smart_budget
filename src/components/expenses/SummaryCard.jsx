@@ -5,21 +5,21 @@ export default function SummaryCard({
   summary,
   fontWeight,
   headTo,
-  link,
+  onClick,
 }) {
   return (
-    <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm sm:p-6">
+    <div className="overflow-hidden rounded-lg bg-white px-4 py-7 shadow-sm sm:p-6">
       <div className="flex items-start justify-between">
         <div>
-          <dt className="text-sm font-medium text-gray-500">{title}</dt>
+          <dt className="text-md font-medium text-sky-600">{title}</dt>
           <dd
-            className={`mt-2 font-semibold tracking-tight text-gray-900 ${fontWeight}`}
+            className={`mt-2 font-semibold tracking-tight text-gray-700 ${fontWeight}`}
           >
             {summary}
           </dd>
         </div>
         <div className="self-center">
-          <MenuDropDownButton headTo={headTo} link={link} />
+          <MenuDropDownButton headTo={headTo} onClick={onClick} />
         </div>
       </div>
     </div>

@@ -1,16 +1,14 @@
+import { useEffect, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { getMonthName } from "../helperFunctions";
+
 import Loading from "../components/alerts/Loading";
 import AllDatesDropDown from "./AllDatesDropDown";
-import { useState } from "react";
+import { useTargetMonth } from "../contexts/TargetMonthContext";
 
-export default function SelectedDate({
-  targetMonth,
-  targetYear,
-  allDates,
-  handleSelectedDateId,
-}) {
+export default function SelectedDate({ allDates, handleSelectedDateId }) {
   const [showOptions, setShowOptions] = useState(false);
+  const { targetMonth, targetYear } = useTargetMonth();
 
   const handleShowOptions = () => {
     setShowOptions((show) => !show);
@@ -25,7 +23,7 @@ export default function SelectedDate({
             className="flex items-center space-x-2 cursor-pointer"
           >
             <h1 className="text-2xl font-bold tracking-tight text-sky-700 flex items-center transition-all duration-200 hover:text-sky-600 hover:underline">
-              {targetMonth ? (
+              {targetMonth !== null && targetYear !== null ? (
                 `${getMonthName(targetMonth)}, ${targetYear}`
               ) : (
                 <Loading />
@@ -42,6 +40,7 @@ export default function SelectedDate({
               {showOptions && (
                 <AllDatesDropDown
                   allDates={allDates}
+                  setShowOptions={setShowOptions}
                   handleSelectedDateId={handleSelectedDateId}
                 />
               )}

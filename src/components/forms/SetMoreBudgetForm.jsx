@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import axios from "axios";
 
 import MonthSelector from "../MonthSelector";
@@ -8,6 +7,7 @@ import SaveButton from "../buttons/SaveButton";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import ModalError from "../alerts/ModalError";
 import useTargetMonthPicker from "../../customHooks/useTargetMonthPicker";
+import useModal from "../../customHooks/useModal";
 
 export default function SetMoreBudgetForm() {
   const {
@@ -20,23 +20,10 @@ export default function SetMoreBudgetForm() {
   const { refreshTargetMonth } = useTargetMonth();
   const { targetMonth, targetYear, handleChange, isSubmittingPast } =
     useTargetMonthPicker();
-
-  const [modalState, setModalState] = useState({
-    visible: false,
-    title: "",
-    message: "",
-  });
-
-  const showModal = (title, message) => {
-    setModalState({
-      visible: true,
-      title,
-      message,
-    });
-  };
+  const { modalState, showModal, hideModal } = useModal();
 
   const onSubmit = async (data) => {
-    if (isSubmittingPast) {
+    if (isSubmittingPast()) {
       showModal(
         "Invalid Date",
         "A budget for a past month or year cannot be set."
@@ -56,7 +43,9 @@ export default function SetMoreBudgetForm() {
       });
 
       if (res.status === 201 && res.data.message.includes("successfully")) {
-        await refreshTargetMonth();
+        const { dateId, year, month } = res.data;
+        await refreshTargetMonth({ id: dateId, year, month });
+
         navigate("/category-list");
       }
     } catch (e) {
@@ -74,10 +63,10 @@ export default function SetMoreBudgetForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md space-y-6 bg-white p-6 rounded-lg shadow-md"
+        className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 space-y-6 transition-all duration-300"
       >
         <MonthSelector
           handleChange={handleChange}
@@ -85,9 +74,9 @@ export default function SetMoreBudgetForm() {
           targetMonth={targetMonth}
         />
 
-        <div className="relative mt-4">
-          <div className="flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 focus-within:border-indigo-500">
-            <span className="text-gray-500">$</span>
+        <div className="relative mt-2">
+          <div className="flex items-center border border-gray-300 rounded-lg px-4 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-400">
+            <span className="text-gray-500 mr-2 text-base font-medium">$</span>
             <input
               {...register("targetSpending", {
                 required: "Please enter your target spending",
@@ -96,7 +85,7 @@ export default function SetMoreBudgetForm() {
               type="number"
               name="targetSpending"
               id="targetSpending"
-              className="block w-full border-none bg-transparent px-2 text-lg text-gray-900 placeholder-gray-400 focus:outline-none"
+              className="flex-1 text-base text-gray-900 placeholder-gray-400 border-none bg-transparent focus:outline-none"
               placeholder="0.00"
               aria-describedby="price-currency"
             />
@@ -118,9 +107,7 @@ export default function SetMoreBudgetForm() {
         <ModalError
           title={modalState.title}
           description={modalState.message}
-          onClose={() =>
-            setModalState({ visible: false, title: "", message: "" })
-          }
+          onClose={() => hideModal()}
         />
       )}
     </div>

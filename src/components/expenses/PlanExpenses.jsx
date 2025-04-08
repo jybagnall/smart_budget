@@ -1,33 +1,47 @@
 import { useFetchedData } from "../../customHooks/useFetchedData";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import CategoryCard from "./CategoryCard";
+import { useState } from "react";
+import CategoryCardEmpty from "./CategoryCardEmpty";
+import AddCategoryCard from "../buttons/AddCategoryCard";
 
 export default function PlanExpenses() {
   const { dateId } = useTargetMonth();
-
   const { categories, items, fetchItems, setItems } = useFetchedData(dateId);
+  const [activeCategoryID, setActiveCategoryID] = useState(null);
+  const [editID, setEditID] = useState(null);
+
+  const categoriesExist = categories.length > 0;
 
   return (
-    <div className="w-full max-w-3xl mx-auto pt-4 pb-6">
-      <ul
-        role="list"
-        className="grid grid-cols-1 lg:grid-cols-2 gap-4 auto-rows-fr"
-      >
-        {categories.map((category) => (
-          <li
-            key={category.id}
-            className="w-full flex-grow min-w-[380px] max-w-[480px] mx-auto"
-          >
-            <CategoryCard
-              key={category.id}
-              category={category}
-              items={items}
-              fetchItems={fetchItems}
-              setItems={setItems}
-            />
+    <div className="w-full px-4 pt-4 pb-6">
+      {categoriesExist ? (
+        <ul
+          role="list"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full px-4"
+        >
+          {categories.map((category) => (
+            <li key={category.id} className="flex flex-col min-w-0">
+              <CategoryCard
+                key={category.id}
+                category={category}
+                items={items}
+                fetchItems={fetchItems}
+                setItems={setItems}
+                activeCategoryID={activeCategoryID}
+                setActiveCategoryID={setActiveCategoryID}
+                editID={editID}
+                setEditID={setEditID}
+              />
+            </li>
+          ))}
+          <li className="flex flex-col min-w-0">
+            <AddCategoryCard />
           </li>
-        ))}
-      </ul>
+        </ul>
+      ) : (
+        <CategoryCardEmpty />
+      )}
     </div>
   );
 }

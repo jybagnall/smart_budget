@@ -28,7 +28,7 @@ router.get(
       if (initialBudget === null) {
         redirectUrl = process.env.FRONTEND_URL + "/set-budgets";
       } else {
-        redirectUrl = process.env.FRONTEND_URL + "/plan-expenses";
+        redirectUrl = process.env.FRONTEND_URL + "/expense-status";
       }
 
       res.redirect(redirectUrl);

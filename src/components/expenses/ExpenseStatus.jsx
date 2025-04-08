@@ -7,7 +7,7 @@ import {
   calculateGrossSpending,
   fetchTargetSpending,
 } from "../../../backend/helpers/api";
-import Chart from "./Chart";
+import ChartConainer from "./ChartContainer";
 import TotalExpenditure from "./TotalExpenditure";
 import SpendingByCategory from "./SpendingByCategory";
 
@@ -35,12 +35,6 @@ export default function ExpenseStatus() {
     loadData();
   }, [dateId]);
 
-  useEffect(() => {
-    if (sumPerCategory.length > 0) {
-      console.log("sumPerCategory:", sumPerCategory);
-    }
-  }, [sumPerCategory]);
-
   if (isLoading) {
     return <Loading />;
   }
@@ -48,9 +42,9 @@ export default function ExpenseStatus() {
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6 flex justify-center items-center">
+        <div className="rounded-lg shadow-md p-6 flex justify-center items-center">
           <div className="w-60 h-60">
-            <Chart sumPerCategory={sumPerCategory} />
+            <ChartConainer sumPerCategory={sumPerCategory} />
           </div>
         </div>
 

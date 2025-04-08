@@ -6,6 +6,7 @@ import { getMonthName, formatMoney } from "../../helperFunctions";
 import { useTargetMonth } from "../../contexts/TargetMonthContext";
 import Loading from "../alerts/Loading";
 import SaveButton from "../buttons/SaveButton";
+import { showSuccessToast } from "../alerts/toastUtils";
 
 export default function EditBudgetForm() {
   const {
@@ -15,8 +16,6 @@ export default function EditBudgetForm() {
   } = useForm();
 
   const { dateId, isLoading } = useTargetMonth();
-
-  // const navigate = useNavigate();
 
   const [month, setMonth] = useState(null);
   const [year, setYear] = useState(null);
@@ -51,7 +50,7 @@ export default function EditBudgetForm() {
 
   const onSubmit = async (data) => {
     const payload = {
-      target_amount: data.target_amount,
+      target_amount: Number(data.target_amount),
       dateId,
     };
 
@@ -61,7 +60,7 @@ export default function EditBudgetForm() {
       });
 
       if (res.status === 200) {
-        alert("success");
+        showSuccessToast("Successfully updated!");
       }
     } catch (e) {
       console.error(e);
@@ -69,10 +68,10 @@ export default function EditBudgetForm() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto space-y-8 bg-white p-6 rounded-lg shadow-md transition-all duration-300 ease-in-out"
+        className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto space-y-8 bg-white p-6 rounded-lg shadow-xl transition-all duration-300 ease-in-out"
       >
         <label
           htmlFor="target_amount"
@@ -93,12 +92,15 @@ export default function EditBudgetForm() {
                 required: "Please enter your target spending",
                 min: { value: 0, message: "Amount must be positive" },
               })}
-              type="number"
+              type="text"
               name="target_amount"
               id="target_amount"
               className="block w-full border-none bg-transparent px-2 text-lg text-gray-900 placeholder-gray-400 focus:outline-none"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
+              value={formatMoney(budget)}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/,/g, "");
+                setBudget(raw);
+              }}
               aria-describedby="price-currency"
             />
             <span id="price-currency" className="text-gray-500">

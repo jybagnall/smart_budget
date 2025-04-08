@@ -168,22 +168,16 @@ router.post("/set-more-budgets", isLoggedIn, async (req, res) => {
   const userId = req.user.id;
 
   try {
-    console.log("'/set-more-'budgets' endpoint hit");
-
     const dateIdExists_q = `
     SELECT id
     FROM dates
     WHERE year = ? AND month = ? AND user_id = ?
     LIMIT 1
     `;
-    console.log("Incoming request:", { year, month, userId });
 
     const [row] = await pool.execute(dateIdExists_q, [year, month, userId]);
-    console.log("Row result from DB:", row);
 
     if (row.length) {
-      console.log("Budget already exists — returning 409");
-
       return res
         .status(409)
         .json({ message: "This month already has a budget set." });
@@ -208,9 +202,12 @@ router.post("/set-more-budgets", isLoggedIn, async (req, res) => {
 
     await pool.execute(insertBudgets_q, [target_amount, dateId]);
 
-    return res
-      .status(201)
-      .json({ message: "successfully inserted new target spending" });
+    return res.status(201).json({
+      message: "successfully inserted new target spending",
+      dateId,
+      year,
+      month: month - 1,
+    });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ message: "Server error" });

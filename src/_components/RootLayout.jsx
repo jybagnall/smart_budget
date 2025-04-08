@@ -7,8 +7,7 @@ import Navbar from "./Navbar";
 import { useTargetMonth } from "../contexts/TargetMonthContext";
 
 export default function RootLayout() {
-  const { dateId, targetMonth, targetYear, isLoading, refreshTargetMonth } =
-    useTargetMonth();
+  const { dateId, isLoading, refreshTargetMonth } = useTargetMonth();
 
   const [allDates, setAllDates] = useState([]);
 
@@ -18,10 +17,10 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    loadAllDates();
-  }, [loadAllDates]);
-
-  useEffect(() => {}, [dateId]);
+    if (dateId) {
+      loadAllDates();
+    }
+  }, [dateId, loadAllDates]);
 
   if (isLoading) {
     return <Loading />;
@@ -34,7 +33,7 @@ export default function RootLayout() {
       refreshTargetMonth({
         id: selected.id,
         year: selected.year,
-        month: selected.month,
+        month: selected.month - 1,
       });
     }
   };
@@ -43,18 +42,16 @@ export default function RootLayout() {
     <div className="flex justify-center bg-white min-h-screen">
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 bg-white rounded-lg shadow-md">
         <Navbar />
-        <div className="pt-20 pb-2">
+        <div className="pt-30 pb-2">
           <div>
             <SelectedDate
-              targetMonth={targetMonth}
-              targetYear={targetYear}
               handleSelectedDateId={handleSelectedDateId}
               allDates={allDates}
             />
           </div>
         </div>
-        <main className="w-full pt-20 pb-8 sm:pt-24">
-          <div className="max-w-3xl mx-auto">
+        <main className="w-full pt-[20px] pb-8">
+          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
             <Outlet />
           </div>
         </main>

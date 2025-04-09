@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { PieChart } from "react-minimal-pie-chart";
 import { getHexColor, getTextColor } from "../../helperFunctions";
 import ChartEmpty from "./ChartEmpty";
 import ChartWithData from "./ChartWithData";
@@ -7,18 +6,19 @@ import ChartWithData from "./ChartWithData";
 export default function ChartContainer({ sumPerCategory }) {
   const [hovered, setHovered] = useState(null);
 
-  const chartData = sumPerCategory.map((category, index) => {
-    const baseColor = getHexColor(category.category_name);
-    const ishovered = hovered === index;
-    const value = parseFloat(category.total_per_category || 0);
-    // const categoryPercentage = targetBudget ? (value/targetBudget) * 100 : 0;
+  const chartData = sumPerCategory
+    .map((category, index) => {
+      const baseColor = getHexColor(category.category_name);
+      const ishovered = hovered === index;
+      const value = parseFloat(category.total_per_category || 0);
 
-    return {
-      title: category.category_name,
-      value,
-      color: ishovered ? "#fafaf9" : baseColor,
-    };
-  });
+      return {
+        title: category.category_name,
+        value,
+        color: ishovered ? "#fafaf9" : baseColor,
+      };
+    })
+    .filter((entry) => entry.value > 0);
 
   const isChartEmpty =
     chartData.length === 0 || chartData.every((d) => d.value === 0);

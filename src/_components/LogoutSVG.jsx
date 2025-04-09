@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useContext } from "react";
+import { PowerIcon } from "@heroicons/react/24/outline";
 
 import UserContext from "../contexts/UserContext";
 
@@ -20,28 +21,10 @@ export default function LogoutSVG() {
   return (
     <button
       onClick={handleLogout}
-      title="logout"
-      className="flex items-center gap-2 text-sm text-gray-700 hover:text-red-600 transition"
+      title="Logout"
+      className="group relative p-2 rounded-full transition-all duration-200 ease-in-out hover:ring-2 hover:ring-rose-400 hover:bg-red-50"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth="1.5"
-        stroke="currentColor"
-        className="w-5 h-5"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M18 12H9.75M15.75 9l2.25 3-2.25 3"
-        />
-      </svg>
+      <PowerIcon className="w-6 h-6 text-gray-600 group-hover:text-rose-500 transition-colors duration-200" />
     </button>
   );
 }

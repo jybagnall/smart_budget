@@ -5,6 +5,19 @@ export function useFetchedData(dateId) {
   const [categories, setCategories] = useState([]);
   const [items, setItems] = useState([]);
 
+  const fetchCategories = useCallback(async () => {
+    if (!dateId) return;
+
+    try {
+      const res = await axios.get(`/api/categories?dateId=${dateId}`, {
+        withCredentials: true,
+      });
+      setCategories(res.data || []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }, [dateId]);
+
   const fetchItems = useCallback(async () => {
     if (!dateId) return;
 
@@ -21,19 +34,9 @@ export function useFetchedData(dateId) {
   useEffect(() => {
     if (!dateId) return;
 
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get(`/api/categories?dateId=${dateId}`, {
-          withCredentials: true,
-        });
-        setCategories(res.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
     fetchCategories();
     fetchItems();
-  }, [dateId, fetchItems]);
+  }, [dateId, fetchItems, fetchCategories]);
 
-  return { categories, items, setItems, fetchItems };
+  return { categories, items, setItems, fetchItems, fetchCategories };
 }

@@ -11,7 +11,6 @@ export default function AddCategoryForm({ handleAdd }) {
     watch,
   } = useForm();
 
-  //the live input value
   const categoryValue = watch("category_name", "");
 
   const onSubmit = async (data) => {
